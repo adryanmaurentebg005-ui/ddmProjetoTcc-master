@@ -1,232 +1,105 @@
 import React from 'react';
-import { Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
-import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import { Link, router, useLocalSearchParams } from 'expo-router';
-import { StatusBadge } from '../../components/StatusBadge';
+import { ActivityIndicator, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import { router, useLocalSearchParams } from 'expo-router';
+import { ComplaintCard } from '../../components/ComplaintCard';
 import { Button } from '../../components/Button';
 import { useAuth } from '../../contexts/AuthContext';
+import { useAppTheme } from '../../contexts/ThemeContext';
 import { observarDenunciasDoUsuario, excluirDenuncia } from '../../services/denuncias';
 import { Denuncia } from '../../types';
-import { theme } from '../../constants/theme';
 import { getNomeCategoria } from '../../constants/categorias';
-import { useAppTheme } from '../../contexts/ThemeContext';
+import { theme } from '../../constants/theme';
 
+const filters = [
+  { key: 'TODAS', title: 'Todas' },
+  { key: 'ENVIADA', title: 'Enviadas' },
+  { key: 'EM_ANALISE', title: 'Em análise' },
+  { key: 'RESOLVIDA', title: 'Resolvidas' },
+] as const;
 export default function MinhasDenunciasScreen() {
   useAppTheme();
   const { success } = useLocalSearchParams<{ success?: string }>();
   const { user } = useAuth();
-  const [denuncias, setDenuncias] = React.useState<Denuncia[]>([]);
+  const [items, setItems] = React.useState<Denuncia[]>([]);
   const [loading, setLoading] = React.useState(true);
-  const [query, setQuery] = React.useState('');
+  const [error, setError] = React.useState(false);
+  const [search, setSearch] = React.useState('');
+  const [filter, setFilter] = React.useState<string>('TODAS');
   const [pendingDelete, setPendingDelete] = React.useState<Denuncia | null>(null);
-  const [feedback, setFeedback] = React.useState<string | null>(null);
-  const [successVisible, setSuccessVisible] = React.useState(success === '1');
-
+  const [deleting, setDeleting] = React.useState(false);
+  const [feedback, setFeedback] = React.useState('');
   React.useEffect(() => {
-    if (success !== '1') return;
-    setSuccessVisible(true);
-    const timeout = setTimeout(() => {
-      setSuccessVisible(false);
-      router.setParams({ success: undefined });
-    }, 4000);
-    return () => clearTimeout(timeout);
-  }, [success]);
-
-  React.useEffect(() => {
-    if (!feedback) return;
-    const timeout = setTimeout(() => setFeedback(null), 4000);
-    return () => clearTimeout(timeout);
-  }, [feedback]);
-  React.useEffect(() => {
-    if (!user) return;
-    const unsubscribe = observarDenunciasDoUsuario(
-      user.uid,
-      (nextDenuncias) => {
-        setDenuncias(nextDenuncias);
-        setLoading(false);
-      },
-      (error) => {
-        console.error(error);
-        setLoading(false);
-      },
-    );
-    return unsubscribe;
-  }, [user]);
-
-  const filteredDenuncias = denuncias.filter((item) => {
-    const search = query.trim().toLocaleLowerCase();
-    const categoryNames: Record<string, string> = { buraco: 'Buraco na via', iluminacao: 'Iluminação pública', lixo: 'Lixo e resíduos', calcada: 'Calçada', semaforo: 'Semáforo', alagamento: 'Alagamento', outro: 'Outro' };
-    return !search || [item.titulo, item.descricao, item.categoriaId, categoryNames[item.categoriaId] ?? ''].some((value) => value.toLocaleLowerCase().includes(search));
+    if (!user) { setItems([]); setLoading(false); return; }
+    setLoading(true);
+    return observarDenunciasDoUsuario(user.uid, next => { setItems(next); setLoading(false); setError(false); }, err => { console.error(err); setLoading(false); setError(true); });
+  }, [user?.uid]);
+  const filtered = items.filter(item => {
+    const q = search.trim().toLocaleLowerCase('pt-BR');
+    const matches = !q || [item.titulo, item.descricao, item.protocolo, getNomeCategoria(item.categoriaId)].some(value => value.toLocaleLowerCase('pt-BR').includes(q));
+    return matches && (filter === 'TODAS' || item.status === filter);
   });
-
-  const handleDelete = async () => {
-    if (!pendingDelete || !user) return;
-    try {
-      await excluirDenuncia(pendingDelete.id, user.uid);
-      setDenuncias((current) => current.filter((item) => item.id !== pendingDelete.id));
-      setFeedback('Denúncia excluída com sucesso.');
-    } catch (error) {
-      console.error(error);
-      setFeedback('Não foi possível excluir a denúncia.');
-    } finally {
-      setPendingDelete(null);
-    }
-  };
-
-  return (
-    <View style={styles.container}>
+  async function remove() {
+    if (!user || !pendingDelete || deleting) return;
+    setDeleting(true); setFeedback('');
+    try { await excluirDenuncia(pendingDelete.id, user.uid); setItems(current => current.filter(item => item.id !== pendingDelete.id)); setFeedback('Ocorrência excluída com sucesso.'); setPendingDelete(null); }
+    catch { setFeedback('Não foi possível excluir a ocorrência.'); }
+    finally { setDeleting(false); }
+  }
+  return <View style={[styles.screen, { backgroundColor: theme.colors.background }]}>
+    <View style={styles.content}>
       <View style={styles.header}>
-        <Text style={styles.title}>Minhas denúncias</Text>
-        <Link href="/(citizen)/denuncia/localizacao" style={styles.link}>
-          <MaterialIcons name="add" size={22} color={theme.colors.primaryLight} />
-        </Link>
+        <View style={{ flex: 1 }}><Text style={[styles.kicker, { color: theme.colors.primaryLight }]}>ACOMPANHAMENTO</Text><Text style={[styles.title, { color: theme.colors.text }]}>Meus registros</Text><Text style={[styles.subtitle, { color: theme.colors.textSecondary }]}>{items.length} {items.length === 1 ? 'ocorrência registrada' : 'ocorrências registradas'}</Text></View>
+        <Pressable accessibilityRole="button" accessibilityLabel="Nova denúncia" onPress={() => router.push('/(citizen)/denuncia/localizacao')} style={[styles.add, { backgroundColor: theme.colors.primaryLight }]}><MaterialCommunityIcons name="plus" size={27} color="#FFFFFF"/></Pressable>
       </View>
-
-      <View style={styles.searchBox}>
-        <MaterialIcons name="search" size={20} color={theme.colors.textSecondary} />
-        <TextInput placeholder="Buscar por título, descrição ou categoria" placeholderTextColor={theme.colors.placeholder} value={query} onChangeText={setQuery} style={styles.searchInput} />
+      <View style={[styles.search, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
+        <MaterialCommunityIcons name="magnify" size={23} color={theme.colors.textSecondary}/>
+        <TextInput accessibilityLabel="Buscar ocorrências" style={[styles.searchInput, { color: theme.colors.text }]} placeholder="Buscar ocorrências..." placeholderTextColor={theme.colors.placeholder} value={search} onChangeText={setSearch}/>
       </View>
-
-      {successVisible && <Text style={styles.success}>Denúncia cadastrada com sucesso.</Text>}
-      {feedback && <Text style={styles.success}>{feedback}</Text>}
-
-      <ScrollView contentContainerStyle={styles.list}>
-        {!loading && filteredDenuncias.length === 0 && <Text style={styles.empty}>Nenhuma denúncia encontrada.</Text>}
-        {filteredDenuncias.map((item) => (
-          <View key={item.id} style={styles.card}>
-            <Link href={`/(citizen)/denuncia/${item.id}`} asChild>
-              <Pressable style={styles.cardBody}>
-              <View style={styles.cardHeader}>
-                <Text style={styles.cardTitle}>{item.titulo}</Text>
-                <StatusBadge status={item.status} />
-              </View>
-              <Text style={styles.cardText}>{item.descricao}</Text>
-              <Text style={styles.cardMeta}>{item.localizacao.endereco}</Text>
-              <Text style={styles.cardMeta}>Categoria: {getNomeCategoria(item.categoriaId)}</Text>
-              <Text style={styles.cardMeta}>Ocorrência em: {new Date(item.dataOcorrencia ?? item.data).toLocaleString('pt-BR')}</Text>
-              <Text style={styles.cardMeta}>Enviada em: {new Date(item.data).toLocaleString('pt-BR')}</Text>
-              <Text style={styles.cardMeta}>Protocolo: {item.protocolo}</Text>
-              </Pressable>
-            </Link>
-            <Pressable accessibilityLabel={`Excluir ${item.titulo}`} onPress={() => setPendingDelete(item)} style={styles.deleteButton}>
-              <MaterialIcons name="delete-outline" size={22} color={theme.colors.error} />
-            </Pressable>
-          </View>
-        ))}
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filters}>
+        {filters.map(f => <Pressable key={f.key} accessibilityRole="button" accessibilityState={{ selected: filter === f.key }} onPress={() => setFilter(f.key)} style={[styles.chip, { backgroundColor: filter === f.key ? theme.colors.primaryLight : theme.colors.surface, borderColor: filter === f.key ? theme.colors.primaryLight : theme.colors.border }]}>
+          <Text style={{ fontWeight: '800', fontSize: 12, color: filter === f.key ? '#FFFFFF' : theme.colors.textSecondary }}>{f.title}</Text>
+        </Pressable>)}
       </ScrollView>
-
-      <Modal visible={Boolean(pendingDelete)} transparent animationType="fade" onRequestClose={() => setPendingDelete(null)}>
-        <View style={styles.modalBackdrop}>
-          <View style={styles.modalCard}>
-            <Text style={styles.modalTitle}>Excluir denúncia?</Text>
-            <Text style={styles.modalText}>Tem certeza que deseja excluir esta denúncia? Essa ação não poderá ser desfeita.</Text>
-            <View style={styles.modalActions}>
-              <Button title="Cancelar" variant="primary" onPress={() => setPendingDelete(null)} style={styles.modalButton} />
-              <Button title="Excluir" variant="danger" onPress={handleDelete} style={styles.modalButton} />
-            </View>
-          </View>
-        </View>
-      </Modal>
+      {success === '1' ? <Text style={[styles.feedback, { color: theme.colors.success }]}>Ocorrência registrada com sucesso.</Text> : null}
+      {feedback ? <Text style={[styles.feedback, { color: theme.colors.text }]}>{feedback}</Text> : null}
     </View>
-  );
+    <ScrollView contentContainerStyle={styles.list}>
+      {loading ? <ActivityIndicator color={theme.colors.primaryLight} size="large"/> : error ? <Text style={{ color: theme.colors.error }}>Não foi possível carregar seus registros.</Text> : filtered.length === 0 ?
+        <View style={[styles.empty, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}><MaterialCommunityIcons name="clipboard-search-outline" size={39} color={theme.colors.primaryLight}/><Text style={[styles.emptyTitle, { color: theme.colors.text }]}>Nenhum registro encontrado</Text><Text style={[styles.emptyText, { color: theme.colors.textSecondary }]}>Tente outro filtro ou registre uma nova ocorrência.</Text></View> :
+        filtered.map(item => <View key={item.id} style={{ marginBottom: 5 }}><ComplaintCard item={item}/><Pressable accessibilityRole="button" accessibilityLabel={`Excluir ${item.titulo}`} onPress={() => setPendingDelete(item)} style={styles.delete}><MaterialCommunityIcons name="trash-can-outline" size={17} color={theme.colors.error}/><Text style={{ color: theme.colors.error, fontSize: 12, fontWeight: '800' }}>Excluir registro</Text></Pressable></View>)
+      }
+    </ScrollView>
+    <Modal visible={Boolean(pendingDelete)} transparent animationType="fade" onRequestClose={() => !deleting && setPendingDelete(null)}>
+      <View style={styles.backdrop}><View style={[styles.modal, { backgroundColor: theme.colors.surface }]}>
+        <Text style={[styles.modalTitle, { color: theme.colors.text }]}>Excluir ocorrência?</Text>
+        <Text style={[styles.modalText, { color: theme.colors.textSecondary }]}>Essa ação é permanente. Deseja excluir o registro {pendingDelete?.protocolo}?</Text>
+        <View style={styles.actions}><Button title="Cancelar" variant="secondary" disabled={deleting} onPress={() => setPendingDelete(null)} style={{ flex: 1 }}/><Button title="Excluir" variant="danger" loading={deleting} onPress={remove} style={{ flex: 1 }}/></View>
+      </View></View>
+    </Modal>
+  </View>;
 }
-
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: theme.colors.background,
-    padding: 20,
-    paddingTop: theme.spacing.screenTop,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginTop: 0,
-    marginBottom: 18,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: '800',
-    color: theme.colors.primary,
-  },
-  link: {
-    padding: 8,
-  },
-  searchBox: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: theme.colors.surface,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    paddingHorizontal: 12,
-    marginBottom: 18,
-  },
-  searchInput: {
-    flex: 1,
-    padding: 12,
-    fontSize: 15,
-    color: theme.colors.inputText,
-  },
-  list: {
-    paddingBottom: 24,
-  },
-  card: {
-    backgroundColor: theme.colors.surface,
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    position: 'relative',
-  },
-  cardBody: {
-    paddingRight: 38,
-  },
-  cardHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-    gap: 12,
-  },
-  cardTitle: {
-    flex: 1,
-    fontSize: 18,
-    fontWeight: '700',
-    color: theme.colors.primary,
-  },
-  cardText: {
-    color: theme.colors.textSecondary,
-    marginBottom: 8,
-  },
-  cardMeta: {
-    color: theme.colors.text,
-    fontSize: 12,
-    marginBottom: 2,
-  },
-  empty: {
-    color: theme.colors.textSecondary,
-    paddingVertical: 20,
-  },
-  deleteButton: {
-    position: 'absolute',
-    right: 12,
-    bottom: 12,
-    padding: 8,
-  },
-  modalBackdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.45)', justifyContent: 'center', padding: 20 },
-  modalCard: { backgroundColor: theme.colors.surface, borderRadius: 18, padding: 22 },
-  modalTitle: { color: theme.colors.primary, fontSize: 20, fontWeight: '800', marginBottom: 12 },
-  modalText: { color: theme.colors.text, lineHeight: 21, marginBottom: 20 },
-  modalActions: { flexDirection: 'row', justifyContent: 'flex-end', gap: 10 },
-  modalButton: { minWidth: 100 },
-  success: {
-    color: theme.colors.success,
-    backgroundColor: '#EAF6EA',
-    borderRadius: 10,
-    padding: 12,
-    marginBottom: 14,
-  },
+  screen: { flex: 1 },
+  content: { paddingHorizontal: 20, paddingTop: 25, maxWidth: 760, width: '100%', alignSelf: 'center' },
+  header: { flexDirection: 'row', alignItems: 'center', gap: 14, marginBottom: 23 },
+  kicker: { fontSize: 10, letterSpacing: 2, fontWeight: '900' },
+  title: { fontSize: 29, letterSpacing: -1, fontWeight: '900', marginTop: 6 },
+  subtitle: { fontSize: 13, marginTop: 5 },
+  add: { width: 49, height: 49, borderRadius: 17, alignItems: 'center', justifyContent: 'center' },
+  search: { minHeight: 54, borderRadius: 16, borderWidth: 1, paddingHorizontal: 14, flexDirection: 'row', alignItems: 'center', gap: 9 },
+  searchInput: { flex: 1, fontSize: 14, paddingVertical: 13 },
+  filters: { flexDirection: 'row', gap: 8, paddingVertical: 17 },
+  chip: { borderWidth: 1, paddingVertical: 11, paddingHorizontal: 15, borderRadius: 99 },
+  list: { paddingHorizontal: 20, paddingBottom: 36, maxWidth: 760, width: '100%', alignSelf: 'center' },
+  delete: { flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', gap: 6, marginTop: -4, marginBottom: 12, paddingVertical: 7, paddingHorizontal: 5 },
+  empty: { borderRadius: 23, padding: 28, alignItems: 'center', borderWidth: 1 },
+  emptyTitle: { fontSize: 17, fontWeight: '800', marginTop: 13 },
+  emptyText: { fontSize: 13, textAlign: 'center', marginTop: 7 },
+  feedback: { fontSize: 13, fontWeight: '700', marginBottom: 10 },
+  backdrop: { flex: 1, backgroundColor: 'rgba(5,12,30,0.65)', justifyContent: 'center', padding: 22 },
+  modal: { borderRadius: 23, padding: 23 },
+  modalTitle: { fontSize: 21, fontWeight: '900' },
+  modalText: { lineHeight: 22, marginTop: 10, marginBottom: 22 },
+  actions: { flexDirection: 'row', gap: 10 },
 });

@@ -27,8 +27,8 @@ export default function CitizenLayout() {
     >
       <Tabs.Screen name="home" options={{ title: 'Início', tabBarIcon: ({ color, focused }) => <MaterialCommunityIcons name={focused ? 'home-variant' : 'home-variant-outline'} size={25} color={color} /> }} />
       <Tabs.Screen name="minhas-denuncias" options={{ title: 'Registros', tabBarIcon: ({ color, focused }) => <MaterialCommunityIcons name={focused ? 'clipboard-text' : 'clipboard-text-outline'} size={24} color={color} /> }} />
-      <Tabs.Screen name="mapa" options={{ href: null }} />
-      <Tabs.Screen name="notificacoes" options={{ href: null }} />
+      <Tabs.Screen name="mapa" options={{ title: "Locais", tabBarIcon: ({ color, focused }) => <MaterialCommunityIcons name={focused ? "map-marker" : "map-marker-outline"} size={24} color={color} /> }} />
+      <Tabs.Screen name="notificacoes" options={{ title: "Atualizações", tabBarIcon: ({ color, focused }) => <MaterialCommunityIcons name={focused ? "bell" : "bell-outline"} size={24} color={color} /> }} />
       <Tabs.Screen name="perfil" options={{ title: 'Perfil', tabBarIcon: ({ color, focused }) => <MaterialCommunityIcons name={focused ? 'account-circle' : 'account-circle-outline'} size={24} color={color} /> }} />
       <Tabs.Screen name="denuncia/nova" options={{ href: null }} />
       <Tabs.Screen name="denuncia/localizacao" options={{ href: null }} />

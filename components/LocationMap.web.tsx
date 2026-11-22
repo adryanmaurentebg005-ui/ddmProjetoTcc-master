@@ -57,13 +57,13 @@ export default function LocationMap({ onConfirmLocation, onBack }: LocationMapPr
     <View style={styles.screen}>
       <View style={styles.topControls}>
         <Pressable style={styles.floatingButton} onPress={onBack} accessibilityLabel="Voltar">
-          <MaterialCommunityIcons name="arrow-left" size={24} color="#123B65" />
+          <MaterialCommunityIcons name="arrow-left" size={24} color="#17366B" />
         </Pressable>
         <Text style={styles.title}>Selecionar localização</Text>
       </View>
 
       <View style={styles.card}>
-        <MaterialCommunityIcons name="crosshairs-gps" size={44} color="#1976D2" />
+        <MaterialCommunityIcons name="crosshairs-gps" size={44} color="#285CC1" />
         <Text style={styles.subtitle}>Use o GPS do navegador ou informe as coordenadas.</Text>
         <Pressable style={styles.locationButton} onPress={useBrowserLocation} disabled={loading}>
           {loading ? <ActivityIndicator color="#FFFFFF" /> : <MaterialCommunityIcons name="crosshairs-gps" size={20} color="#FFFFFF" />}
@@ -88,18 +88,18 @@ export default function LocationMap({ onConfirmLocation, onBack }: LocationMapPr
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: '#EAF0F6', padding: 20 },
+  screen: { flex: 1, backgroundColor: '#EDF3FC', padding: 20 },
   topControls: { flexDirection: 'row', alignItems: 'center', gap: 14, marginTop: 10, marginBottom: 24 },
   floatingButton: { width: 48, height: 48, borderRadius: 24, backgroundColor: '#FFFFFF', alignItems: 'center', justifyContent: 'center' },
-  title: { fontSize: 24, fontWeight: '800', color: '#123B65', flex: 1 },
+  title: { fontSize: 24, fontWeight: '800', color: '#17366B', flex: 1 },
   card: { backgroundColor: '#FFFFFF', borderRadius: 20, padding: 20, alignItems: 'center' },
-  subtitle: { marginTop: 10, marginBottom: 18, color: '#667085', textAlign: 'center' },
-  locationButton: { minHeight: 48, width: '100%', borderRadius: 12, backgroundColor: '#1976D2', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 18 },
+  subtitle: { marginTop: 10, marginBottom: 18, color: '#667891', textAlign: 'center' },
+  locationButton: { minHeight: 48, width: '100%', borderRadius: 12, backgroundColor: '#285CC1', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 18 },
   locationButtonText: { color: '#FFFFFF', fontWeight: '800' },
-  label: { alignSelf: 'flex-start', color: '#123B65', fontWeight: '700', marginBottom: 8 },
-  input: { width: '100%', borderWidth: 1, borderColor: '#D0D5DD', borderRadius: 12, padding: 13, marginBottom: 14, backgroundColor: '#FFFFFF', color: '#101828' },
+  label: { alignSelf: 'flex-start', color: '#17366B', fontWeight: '700', marginBottom: 8 },
+  input: { width: '100%', borderWidth: 1, borderColor: '#DCE4F0', borderRadius: 12, padding: 13, marginBottom: 14, backgroundColor: '#FFFFFF', color: '#13213B' },
   addressInput: { minHeight: 70 },
   error: { color: '#B42318', marginBottom: 12, alignSelf: 'stretch' },
-  confirmButton: { minHeight: 48, width: '100%', borderRadius: 12, backgroundColor: '#123B65', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 },
+  confirmButton: { minHeight: 48, width: '100%', borderRadius: 12, backgroundColor: '#17366B', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 },
   confirmButtonText: { color: '#FFFFFF', fontWeight: '800' },
 });
