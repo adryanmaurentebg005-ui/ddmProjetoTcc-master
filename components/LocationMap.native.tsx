@@ -27,7 +27,7 @@ interface LocationMapProps {
   onBack?: () => void;
 }
 
-const MAP_STYLE_URL = 'https://demotiles.maplibre.org/style.json';
+const MAP_STYLE_URL = 'https://tiles.openfreemap.org/styles/liberty';
 const INITIAL_ZOOM = 16;
 type ScreenState = 'requesting-permission' | 'loading-location' | 'loading-address' | 'ready' | 'error';
 
