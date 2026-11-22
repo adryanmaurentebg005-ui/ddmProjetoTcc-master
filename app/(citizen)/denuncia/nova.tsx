@@ -1,4 +1,4 @@
-import { Link, router, useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import React from 'react';
 import {
   ActivityIndicator,
@@ -78,7 +78,8 @@ export default function NovaDenunciaScreen() {
       setShowConfirmation(false);
       router.replace({ pathname: '/(citizen)/minhas-denuncias', params: { success: '1' } });
     } catch (saveError) {
-      console.error(saveError);
+      console.error('Falha ao registrar ocorrência:', saveError);
+      setShowConfirmation(false);
       setError(saveError instanceof Error ? saveError.message : 'Não foi possível salvar a denúncia. Tente novamente.');
     } finally {
       setPhotoUploading(false);
@@ -128,15 +129,13 @@ export default function NovaDenunciaScreen() {
       showsVerticalScrollIndicator={false}
     >
       <View style={styles.header}>
-        <Link href="/" asChild>
-          <Pressable style={[styles.backButton, { backgroundColor: theme.colors.elevated }]}>
+        <Pressable accessibilityRole="button" accessibilityLabel="Voltar ao início" onPress={() => router.replace("/(citizen)/home")} style={[styles.backButton, { backgroundColor: theme.colors.elevated }]}>
             <MaterialCommunityIcons
               name="arrow-left"
               size={24}
               color={theme.colors.primaryLight}
             />
-          </Pressable>
-        </Link>
+        </Pressable>
 
         <View style={styles.headerText}>
           <Text style={[styles.title, { color: theme.colors.text }]}>Nova denúncia</Text>
@@ -157,11 +156,9 @@ export default function NovaDenunciaScreen() {
               {hasLocation ? `${latitude.toFixed(6)}, ${longitude.toFixed(6)}` : 'Latitude e longitude serão salvas após a confirmação.'}
             </Text>
           </View>
-          <Link href="/(citizen)/denuncia/localizacao" asChild>
-            <Pressable accessibilityLabel="Alterar localização">
+          <Pressable accessibilityRole="button" onPress={() => router.push("/(citizen)/denuncia/localizacao")} accessibilityLabel="Alterar localização">
             <MaterialCommunityIcons name="pencil" size={20} color="#17366B" />
-            </Pressable>
-          </Link>
+          </Pressable>
         </View>
 
         <Text style={[styles.label, { color: theme.colors.text }]}>Título</Text>
@@ -232,9 +229,10 @@ export default function NovaDenunciaScreen() {
             </View>
           </Modal>
         )}
-        {error && <Text style={styles.error}>{error}</Text>}
+        {error && <View accessibilityRole="alert" style={{ backgroundColor: theme.colors.elevated, padding: 14, borderRadius: 14, marginBottom: 12, flexDirection: 'row', alignItems: 'flex-start', gap: 9 }}><MaterialCommunityIcons name="alert-circle-outline" size={21} color={theme.colors.error} /><Text style={[styles.error, { flex: 1, marginBottom: 0, color: theme.colors.error }]}>{error}</Text></View>}
 
         <Text style={[styles.label, { color: theme.colors.text }]}>Foto da ocorrência</Text>
+        {photoUri && !process.env.EXPO_PUBLIC_IMGBB_API_KEY ? <View style={{ padding: 12, borderRadius: 13, backgroundColor: theme.colors.elevated, marginBottom: 12 }}><Text style={{ color: theme.colors.textSecondary, fontSize: 12, lineHeight: 19 }}>O envio de fotos não está configurado neste aplicativo. Remova o anexo para registrar a denúncia sem foto, ou configure o serviço de imagens.</Text></View> : null}
         {photoUri ? (
           <View style={[styles.photoContainer, { borderColor: theme.colors.border }]}>
             <Image source={{ uri: photoUri }} style={styles.photoPreview} />
