@@ -2,6 +2,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 import * as Location from 'expo-location';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import { theme } from '../constants/theme';
+import { useAppTheme } from '../contexts/ThemeContext';
 import {
   Camera,
   Map,
@@ -39,6 +41,7 @@ function formatAddress(place: Location.LocationGeocodedAddress | undefined, lati
 }
 
 export default function LocationMap({ initialLocation, onLocationChange, onConfirmLocation, onBack }: LocationMapProps) {
+  useAppTheme();
   const cameraRef = useRef<CameraRef>(null);
   const geocodeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const geocodeRequest = useRef(0);
@@ -144,7 +147,7 @@ export default function LocationMap({ initialLocation, onLocationChange, onConfi
         {selectedLocation && (
           <Marker id="selected-location" lngLat={[selectedLocation.longitude, selectedLocation.latitude]}>
             <View style={styles.marker}>
-              <MaterialCommunityIcons name="map-marker" size={42} color="#285CC1" />
+              <MaterialCommunityIcons name="map-marker" size={42} color={theme.colors.primaryLight} />
             </View>
           </Marker>
         )}
@@ -152,38 +155,38 @@ export default function LocationMap({ initialLocation, onLocationChange, onConfi
 
       {!mapReady && (
         <View style={styles.loadingOverlay} pointerEvents="none">
-          <ActivityIndicator color="#285CC1" />
+          <ActivityIndicator color={theme.colors.primaryLight} />
           <Text style={styles.loadingText}>Carregando mapa...</Text>
         </View>
       )}
       <View style={styles.topControls}>
         <Pressable style={styles.floatingButton} onPress={onBack} accessibilityLabel="Voltar">
-          <MaterialCommunityIcons name="arrow-left" size={24} color="#17366B" />
+          <MaterialCommunityIcons name="arrow-left" size={24} color={theme.colors.text} />
         </Pressable>
       </View>
       <View style={styles.addressCard}>
-        <View style={styles.addressIcon}><MaterialCommunityIcons name="map-marker-radius" size={22} color="#285CC1" /></View>
+        <View style={styles.addressIcon}><MaterialCommunityIcons name="map-marker-radius" size={22} color={theme.colors.primaryLight} /></View>
         <View style={styles.addressContent}>
           <Text style={styles.cardLabel}>{state === 'loading-address' ? 'IDENTIFICANDO LOCAL' : 'LOCAL DA OCORRÊNCIA'}</Text>
           <Text style={styles.cardAddress}>{selectedLocation?.address ?? 'Precisamos da sua localização'}</Text>
         </View>
-        {state === 'loading-address' && <ActivityIndicator size="small" color="#285CC1" />}
+        {state === 'loading-address' && <ActivityIndicator size="small" color={theme.colors.primaryLight} />}
       </View>
       <View style={styles.mapControls}>
         <Pressable style={styles.floatingButton} onPress={() => void locateUser()} accessibilityLabel="Minha localização">
-          <MaterialCommunityIcons name="crosshairs-gps" size={24} color="#17366B" />
+          <MaterialCommunityIcons name="crosshairs-gps" size={24} color={theme.colors.text} />
         </Pressable>
       </View>
       {error && (
         <View style={styles.errorCard}>
-          <MaterialCommunityIcons name="alert-circle-outline" size={22} color="#B42318" />
+          <MaterialCommunityIcons name="alert-circle-outline" size={22} color={theme.colors.error} />
           <Text style={styles.errorText}>{error}</Text>
         </View>
       )}
       <View style={styles.bottomSheet}>
         <View style={styles.dragHandle} />
         <View style={styles.sheetHeader}>
-          <MaterialCommunityIcons name="map-marker-check" size={24} color="#285CC1" />
+          <MaterialCommunityIcons name="map-marker-check" size={24} color={theme.colors.primaryLight} />
           <View style={styles.sheetContent}>
             <Text style={styles.sheetTitle}>Local selecionado</Text>
             <Text style={styles.sheetAddress}>{selectedLocation?.address ?? 'Selecione um ponto no mapa'}</Text>
@@ -195,7 +198,7 @@ export default function LocationMap({ initialLocation, onLocationChange, onConfi
           disabled={!selectedLocation || state === 'loading-address'}
           onPress={() => selectedLocation && onConfirmLocation?.(selectedLocation)}
         >
-          <MaterialCommunityIcons name="map-marker-check" size={20} color="#FFFFFF" />
+          <MaterialCommunityIcons name="map-marker-check" size={20} color={'#FFFFFF'} />
           <Text style={styles.confirmButtonText}>Confirmar localização</Text>
         </Pressable>
       </View>
@@ -204,28 +207,28 @@ export default function LocationMap({ initialLocation, onLocationChange, onConfi
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: '#EDF3FC' },
+  screen: { flex: 1, backgroundColor: theme.colors.background },
   marker: { alignItems: 'center', justifyContent: 'center' },
   loadingOverlay: { ...StyleSheet.absoluteFill, alignItems: 'center', justifyContent: 'center' },
-  loadingText: { marginTop: 10, color: '#17366B', fontWeight: '700' },
+  loadingText: { marginTop: 10, color: theme.colors.text, fontWeight: '700' },
   topControls: { position: 'absolute', top: 18, left: 16 },
-  floatingButton: { width: 48, height: 48, borderRadius: 24, backgroundColor: '#FFFFFF', alignItems: 'center', justifyContent: 'center', shadowColor: '#000', shadowOpacity: 0.16, shadowRadius: 8, shadowOffset: { width: 0, height: 3 }, elevation: 5 },
-  addressCard: { position: 'absolute', top: 18, left: 76, right: 16, minHeight: 66, borderRadius: 16, padding: 12, backgroundColor: '#FFFFFF', flexDirection: 'row', alignItems: 'center', shadowColor: '#000', shadowOpacity: 0.14, shadowRadius: 10, shadowOffset: { width: 0, height: 4 }, elevation: 5 },
-  addressIcon: { width: 40, height: 40, borderRadius: 20, backgroundColor: '#E4EEFF', alignItems: 'center', justifyContent: 'center', marginRight: 10 },
+  floatingButton: { width: 48, height: 48, borderRadius: 24, backgroundColor: theme.colors.surface, alignItems: 'center', justifyContent: 'center', shadowColor: '#000', shadowOpacity: 0.16, shadowRadius: 8, shadowOffset: { width: 0, height: 3 }, elevation: 5 },
+  addressCard: { position: 'absolute', top: 18, left: 76, right: 16, minHeight: 66, borderRadius: 16, padding: 12, backgroundColor: theme.colors.surface, flexDirection: 'row', alignItems: 'center', shadowColor: '#000', shadowOpacity: 0.14, shadowRadius: 10, shadowOffset: { width: 0, height: 4 }, elevation: 5 },
+  addressIcon: { width: 40, height: 40, borderRadius: 20, backgroundColor: theme.colors.elevated, alignItems: 'center', justifyContent: 'center', marginRight: 10 },
   addressContent: { flex: 1 },
-  cardLabel: { fontSize: 11, fontWeight: '800', color: '#667891', marginBottom: 3 },
-  cardAddress: { fontSize: 14, lineHeight: 19, fontWeight: '700', color: '#17366B' },
+  cardLabel: { fontSize: 11, fontWeight: '800', color: theme.colors.textSecondary, marginBottom: 3 },
+  cardAddress: { fontSize: 14, lineHeight: 19, fontWeight: '700', color: theme.colors.text },
   mapControls: { position: 'absolute', right: 16, bottom: 230 },
-  errorCard: { position: 'absolute', top: 96, left: 16, right: 16, borderRadius: 14, padding: 12, backgroundColor: '#FFF4F2', flexDirection: 'row', alignItems: 'center', gap: 8 },
-  errorText: { flex: 1, color: '#B42318', fontSize: 12, lineHeight: 17 },
-  bottomSheet: { position: 'absolute', left: 0, right: 0, bottom: 0, borderTopLeftRadius: 26, borderTopRightRadius: 26, paddingHorizontal: 20, paddingTop: 10, paddingBottom: 22, backgroundColor: '#FFFFFF', shadowColor: '#000', shadowOpacity: 0.18, shadowRadius: 12, shadowOffset: { width: 0, height: -3 }, elevation: 10 },
-  dragHandle: { width: 44, height: 4, borderRadius: 2, alignSelf: 'center', backgroundColor: '#DCE4F0', marginBottom: 16 },
+  errorCard: { position: 'absolute', top: 96, left: 16, right: 16, borderRadius: 14, padding: 12, backgroundColor: theme.colors.elevated, flexDirection: 'row', alignItems: 'center', gap: 8 },
+  errorText: { flex: 1, color: theme.colors.error, fontSize: 12, lineHeight: 17 },
+  bottomSheet: { position: 'absolute', left: 0, right: 0, bottom: 0, borderTopLeftRadius: 26, borderTopRightRadius: 26, paddingHorizontal: 20, paddingTop: 10, paddingBottom: 22, backgroundColor: theme.colors.surface, shadowColor: '#000', shadowOpacity: 0.18, shadowRadius: 12, shadowOffset: { width: 0, height: -3 }, elevation: 10 },
+  dragHandle: { width: 44, height: 4, borderRadius: 2, alignSelf: 'center', backgroundColor: theme.colors.border, marginBottom: 16 },
   sheetHeader: { flexDirection: 'row', alignItems: 'flex-start' },
   sheetContent: { flex: 1, marginLeft: 10 },
-  sheetTitle: { fontSize: 13, fontWeight: '800', color: '#667891', marginBottom: 4 },
-  sheetAddress: { fontSize: 16, lineHeight: 22, fontWeight: '800', color: '#17366B' },
-  instruction: { marginTop: 10, color: '#667891', fontSize: 12, lineHeight: 17 },
-  confirmButton: { minHeight: 48, marginTop: 16, borderRadius: 12, backgroundColor: '#285CC1', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 },
+  sheetTitle: { fontSize: 13, fontWeight: '800', color: theme.colors.textSecondary, marginBottom: 4 },
+  sheetAddress: { fontSize: 16, lineHeight: 22, fontWeight: '800', color: theme.colors.text },
+  instruction: { marginTop: 10, color: theme.colors.textSecondary, fontSize: 12, lineHeight: 17 },
+  confirmButton: { minHeight: 48, marginTop: 16, borderRadius: 12, backgroundColor: theme.colors.primaryLight, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 },
   disabledButton: { opacity: 0.5 },
-  confirmButtonText: { color: '#FFFFFF', fontSize: 15, fontWeight: '800' },
+  confirmButtonText: { color: theme.colors.surface, fontSize: 15, fontWeight: '800' },
 });

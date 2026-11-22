@@ -2,10 +2,12 @@ import { Tabs } from 'expo-router';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { theme } from '../../constants/theme';
 import { Platform } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAppTheme } from '../../contexts/ThemeContext';
 
 export default function CitizenLayout() {
   useAppTheme();
+  const insets = useSafeAreaInsets();
   return (
     <Tabs
       screenOptions={{
@@ -14,9 +16,9 @@ export default function CitizenLayout() {
         tabBarInactiveTintColor: theme.colors.textSecondary,
         tabBarHideOnKeyboard: true,
         tabBarStyle: {
-          height: Platform.OS === 'ios' ? 86 : 72,
+          height: 64 + Math.max(insets.bottom, Platform.OS === 'android' ? 12 : 16),
           paddingTop: 9,
-          paddingBottom: Platform.OS === 'ios' ? 23 : 9,
+          paddingBottom: Math.max(insets.bottom, Platform.OS === 'android' ? 12 : 16),
           backgroundColor: theme.colors.surface,
           borderTopColor: theme.colors.border,
           borderTopWidth: 1,

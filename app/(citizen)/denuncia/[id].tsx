@@ -8,10 +8,12 @@ import { useAuth } from '../../../contexts/AuthContext';
 import { Denuncia } from '../../../types';
 import { theme } from '../../../constants/theme';
 import { CATEGORIAS_DENUNCIA, getNomeCategoria } from '../../../constants/categorias';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAppTheme } from '../../../contexts/ThemeContext';
 
 export default function DenunciaDetailScreen() {
   useAppTheme();
+  const insets = useSafeAreaInsets();
   const { id } = useLocalSearchParams<{ id: string }>();
   const [denuncia, setDenuncia] = React.useState<Denuncia | null>(null);
   const [loading, setLoading] = React.useState(true);
@@ -123,7 +125,7 @@ export default function DenunciaDetailScreen() {
           <Text style={styles.value}>Nenhuma foto anexada.</Text>
         )}
 
-        {editSuccess && <Text style={styles.successMessage}>{editSuccess}</Text>}
+        {editSuccess && <Text style={[styles.successMessage, { backgroundColor: theme.colors.elevated }]}>{editSuccess}</Text>}
 
         <Pressable style={styles.editButton} onPress={handleEdit}>
           <Text style={styles.editButtonText}>Editar</Text>
@@ -131,13 +133,13 @@ export default function DenunciaDetailScreen() {
       </View>
 
       <Modal
-        animationType="slide"
+        animationType="fade"
         transparent={true}
         visible={modalVisible}
         onRequestClose={() => setModalVisible(false)}
       >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
+        <View style={[styles.modalOverlay, { paddingBottom: Math.max(insets.bottom, 16) }]}>
+          <View style={[styles.modalContent, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border, maxHeight: '85%' }]}>
             <Text style={styles.modalTitle}>Editar denúncia</Text>
 
             <Text style={styles.label}>Título *</Text>
@@ -189,7 +191,7 @@ export default function DenunciaDetailScreen() {
         onRequestClose={() => setCategoryModalVisible(false)}
       >
         <View style={styles.modalOverlay}>
-          <View style={[styles.modalContent, styles.categoryModalContent]}>
+          <View style={[styles.modalContent, styles.categoryModalContent, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border, maxHeight: '85%' }]}>
             <Text style={styles.modalTitle}>Selecione a categoria</Text>
             {CATEGORIAS_DENUNCIA.map((item) => (
               <Pressable
@@ -234,7 +236,7 @@ const styles = StyleSheet.create({
   },
   card: {
     backgroundColor: theme.colors.surface,
-    borderRadius: 18,
+    borderRadius: 24,
     padding: 18,
     marginTop: 18,
     borderWidth: 1,
@@ -264,14 +266,14 @@ const styles = StyleSheet.create({
   },
   editButton: {
     marginTop: 12,
-    backgroundColor: theme.colors.primary,
-    borderRadius: 8,
+    backgroundColor: theme.colors.primaryLight,
+    borderRadius: 15,
     paddingVertical: 10,
     paddingHorizontal: 16,
     alignItems: 'center',
   },
   editButtonText: {
-    color: theme.colors.surface,
+    color: '#FFFFFF',
     fontWeight: '700',
   },
   modalOverlay: {

@@ -4,6 +4,7 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { router, useLocalSearchParams } from 'expo-router';
 import { ComplaintCard } from '../../components/ComplaintCard';
 import { Button } from '../../components/Button';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '../../contexts/AuthContext';
 import { useAppTheme } from '../../contexts/ThemeContext';
 import { observarDenunciasDoUsuario, excluirDenuncia } from '../../services/denuncias';
@@ -19,6 +20,7 @@ const filters = [
 ] as const;
 export default function MinhasDenunciasScreen() {
   useAppTheme();
+  const insets = useSafeAreaInsets();
   const { success } = useLocalSearchParams<{ success?: string }>();
   const { user } = useAuth();
   const [items, setItems] = React.useState<Denuncia[]>([]);
@@ -71,7 +73,7 @@ export default function MinhasDenunciasScreen() {
       }
     </ScrollView>
     <Modal visible={Boolean(pendingDelete)} transparent animationType="fade" onRequestClose={() => !deleting && setPendingDelete(null)}>
-      <View style={styles.backdrop}><View style={[styles.modal, { backgroundColor: theme.colors.surface }]}>
+      <View style={[styles.backdrop, { paddingBottom: Math.max(insets.bottom, 20) }]}><View style={[styles.modal, { backgroundColor: theme.colors.surface }]}>
         <Text style={[styles.modalTitle, { color: theme.colors.text }]}>Excluir ocorrência?</Text>
         <Text style={[styles.modalText, { color: theme.colors.textSecondary }]}>Essa ação é permanente. Deseja excluir o registro {pendingDelete?.protocolo}?</Text>
         <View style={styles.actions}><Button title="Cancelar" variant="secondary" disabled={deleting} onPress={() => setPendingDelete(null)} style={{ flex: 1 }}/><Button title="Excluir" variant="danger" loading={deleting} onPress={remove} style={{ flex: 1 }}/></View>

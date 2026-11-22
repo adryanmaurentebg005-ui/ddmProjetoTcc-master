@@ -1,6 +1,8 @@
 import React from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import { theme } from '../constants/theme';
+import { useAppTheme } from '../contexts/ThemeContext';
 
 interface SelectedLocation {
   latitude: number;
@@ -14,6 +16,7 @@ interface LocationMapProps {
 }
 
 export default function LocationMap({ onConfirmLocation, onBack }: LocationMapProps) {
+  useAppTheme();
   const [latitude, setLatitude] = React.useState('');
   const [longitude, setLongitude] = React.useState('');
   const [address, setAddress] = React.useState('Localização manual ou por GPS');
@@ -43,9 +46,9 @@ export default function LocationMap({ onConfirmLocation, onBack }: LocationMapPr
   };
 
   const confirm = () => {
-    const lat = Number(latitude);
-    const lng = Number(longitude);
-    if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+    const lat = latitude.trim() === '' ? NaN : Number(latitude);
+    const lng = longitude.trim() === '' ? NaN : Number(longitude);
+    if (!Number.isFinite(lat) || !Number.isFinite(lng) || Math.abs(lat) > 90 || Math.abs(lng) > 180) {
       setError('Informe uma latitude e longitude válidas.');
       return;
     }
@@ -57,16 +60,16 @@ export default function LocationMap({ onConfirmLocation, onBack }: LocationMapPr
     <View style={styles.screen}>
       <View style={styles.topControls}>
         <Pressable style={styles.floatingButton} onPress={onBack} accessibilityLabel="Voltar">
-          <MaterialCommunityIcons name="arrow-left" size={24} color="#17366B" />
+          <MaterialCommunityIcons name="arrow-left" size={24} color={theme.colors.text} />
         </Pressable>
         <Text style={styles.title}>Selecionar localização</Text>
       </View>
 
       <View style={styles.card}>
-        <MaterialCommunityIcons name="crosshairs-gps" size={44} color="#285CC1" />
+        <MaterialCommunityIcons name="crosshairs-gps" size={44} color={theme.colors.primaryLight} />
         <Text style={styles.subtitle}>Use o GPS do navegador ou informe as coordenadas.</Text>
         <Pressable style={styles.locationButton} onPress={useBrowserLocation} disabled={loading}>
-          {loading ? <ActivityIndicator color="#FFFFFF" /> : <MaterialCommunityIcons name="crosshairs-gps" size={20} color="#FFFFFF" />}
+          {loading ? <ActivityIndicator color={'#FFFFFF'} /> : <MaterialCommunityIcons name="crosshairs-gps" size={20} color={'#FFFFFF'} />}
           <Text style={styles.locationButtonText}>{loading ? 'Localizando...' : 'Usar minha localização'}</Text>
         </Pressable>
 
@@ -79,7 +82,7 @@ export default function LocationMap({ onConfirmLocation, onBack }: LocationMapPr
 
         {error && <Text style={styles.error}>{error}</Text>}
         <Pressable style={styles.confirmButton} onPress={confirm}>
-          <MaterialCommunityIcons name="map-marker-check" size={20} color="#FFFFFF" />
+          <MaterialCommunityIcons name="map-marker-check" size={20} color={'#FFFFFF'} />
           <Text style={styles.confirmButtonText}>Confirmar localização</Text>
         </Pressable>
       </View>
@@ -88,18 +91,18 @@ export default function LocationMap({ onConfirmLocation, onBack }: LocationMapPr
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: '#EDF3FC', padding: 20 },
+  screen: { flex: 1, backgroundColor: theme.colors.background, padding: 20 },
   topControls: { flexDirection: 'row', alignItems: 'center', gap: 14, marginTop: 10, marginBottom: 24 },
-  floatingButton: { width: 48, height: 48, borderRadius: 24, backgroundColor: '#FFFFFF', alignItems: 'center', justifyContent: 'center' },
-  title: { fontSize: 24, fontWeight: '800', color: '#17366B', flex: 1 },
-  card: { backgroundColor: '#FFFFFF', borderRadius: 20, padding: 20, alignItems: 'center' },
-  subtitle: { marginTop: 10, marginBottom: 18, color: '#667891', textAlign: 'center' },
-  locationButton: { minHeight: 48, width: '100%', borderRadius: 12, backgroundColor: '#285CC1', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 18 },
-  locationButtonText: { color: '#FFFFFF', fontWeight: '800' },
-  label: { alignSelf: 'flex-start', color: '#17366B', fontWeight: '700', marginBottom: 8 },
-  input: { width: '100%', borderWidth: 1, borderColor: '#DCE4F0', borderRadius: 12, padding: 13, marginBottom: 14, backgroundColor: '#FFFFFF', color: '#13213B' },
+  floatingButton: { width: 48, height: 48, borderRadius: 24, backgroundColor: theme.colors.surface, alignItems: 'center', justifyContent: 'center' },
+  title: { fontSize: 24, fontWeight: '800', color: theme.colors.text, flex: 1 },
+  card: { backgroundColor: theme.colors.surface, borderRadius: 20, padding: 20, alignItems: 'center' },
+  subtitle: { marginTop: 10, marginBottom: 18, color: theme.colors.textSecondary, textAlign: 'center' },
+  locationButton: { minHeight: 48, width: '100%', borderRadius: 12, backgroundColor: theme.colors.primaryLight, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 18 },
+  locationButtonText: { color: theme.colors.surface, fontWeight: '800' },
+  label: { alignSelf: 'flex-start', color: theme.colors.text, fontWeight: '700', marginBottom: 8 },
+  input: { width: '100%', borderWidth: 1, borderColor: theme.colors.border, borderRadius: 12, padding: 13, marginBottom: 14, backgroundColor: theme.colors.surface, color: theme.colors.inputText },
   addressInput: { minHeight: 70 },
-  error: { color: '#B42318', marginBottom: 12, alignSelf: 'stretch' },
-  confirmButton: { minHeight: 48, width: '100%', borderRadius: 12, backgroundColor: '#17366B', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 },
-  confirmButtonText: { color: '#FFFFFF', fontWeight: '800' },
+  error: { color: theme.colors.error, marginBottom: 12, alignSelf: 'stretch' },
+  confirmButton: { minHeight: 48, width: '100%', borderRadius: 12, backgroundColor: theme.colors.text, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 },
+  confirmButtonText: { color: theme.colors.surface, fontWeight: '800' },
 });
