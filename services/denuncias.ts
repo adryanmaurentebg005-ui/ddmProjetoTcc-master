@@ -41,6 +41,8 @@ function toDenuncia(id: string, data: Record<string, unknown>): Denuncia {
     data: dataRegistro,
     usuarioId: String(data.usuarioId ?? ''),
     historico: [],
+    observacaoAdmin: typeof data.observacaoAdmin === 'string' ? data.observacaoAdmin : undefined,
+    atualizadoEm: data.atualizadoEm instanceof Timestamp ? data.atualizadoEm.toDate().toISOString() : undefined,
     dataOcorrencia: data.dataOcorrencia instanceof Timestamp
       ? data.dataOcorrencia.toDate().toISOString()
       : String(data.dataOcorrencia ?? dataRegistro),

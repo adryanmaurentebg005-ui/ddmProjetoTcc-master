@@ -49,6 +49,7 @@ export default function AdminDashboardScreen() {
   const count = (status: string) => items.filter(item => item.status === status).length;
   async function saveStatus() {
     if (!user || !selected || !pendingStatus || saving) return;
+    if (['REJEITADA', 'AGUARDANDO_INFORMACOES'].includes(pendingStatus) && !note.trim()) { setError('Escreva uma justificativa para o cidadão antes de salvar.'); return; }
     setSaving(true); setError('');
     try {
       await atualizarStatusAdministrativo(selected.id, pendingStatus, note, user.uid);
@@ -137,8 +138,9 @@ export default function AdminDashboardScreen() {
                 <Text style={{ color: pendingStatus === action.status ? '#FFFFFF' : theme.colors.text, fontWeight: '700', fontSize: 12 }}>{action.label}</Text>
               </Pressable>)}
             </View>
-            <Text style={{ ...txt, fontWeight: '800', marginTop: 18, marginBottom: 8 }}>Observação administrativa</Text>
-            <TextInput value={note} onChangeText={setNote} multiline maxLength={1000} placeholder="Justificativa, atualização ou encaminhamento..." placeholderTextColor={theme.colors.placeholder} style={{ ...pill, color: theme.colors.text, minHeight: 85, textAlignVertical: 'top', backgroundColor: theme.colors.elevated }}/>
+            <Text style={{ ...txt, fontWeight: '800', marginTop: 18, marginBottom: 8 }}>Mensagem para o cidadão</Text>
+            <TextInput value={note} onChangeText={setNote} multiline maxLength={1000} placeholder="Escreva uma resposta que será exibida ao cidadão..." placeholderTextColor={theme.colors.placeholder} style={{ ...pill, color: theme.colors.text, minHeight: 85, textAlignVertical: 'top', backgroundColor: theme.colors.elevated }}/>
+            <Text style={{ color: theme.colors.textSecondary, fontSize: 12, lineHeight: 18, marginTop: 7 }}>Esta mensagem ficará visível para o autor da denúncia na área de atualizações e nos detalhes do registro.</Text>
             <Pressable disabled={!pendingStatus || saving} onPress={() => void saveStatus()} style={{ marginTop: 16, borderRadius: 13, backgroundColor: theme.colors.primaryLight, opacity: !pendingStatus || saving ? 0.5 : 1, padding: 15, alignItems: 'center' }}>
               {saving ? <ActivityIndicator color="#FFFFFF"/> : <Text style={{ color: '#FFFFFF', fontWeight: '900' }}>Salvar alteração</Text>}
             </Pressable>

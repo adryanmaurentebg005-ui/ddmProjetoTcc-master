@@ -19,9 +19,9 @@ export default function NotificacoesScreen() {
     <Surface>
       {loading ? <ActivityIndicator color={theme.colors.primaryLight}/> : error ? <Text style={{ color: theme.colors.error }}>Não foi possível carregar suas ocorrências.</Text> : items.length === 0 ?
         <InfoRow icon="bell-sleep-outline" title="Sem atualizações" description="Quando você registrar ocorrências, elas aparecerão aqui."/> :
-        items.slice(0, 15).map(item => <View key={item.id}><InfoRow icon="clipboard-check-outline" title={item.titulo} description={`Status atual: ${item.status.replace(/_/g, ' ')} · Protocolo ${item.protocolo}`}/></View>)
+        items.slice(0, 15).map(item => <View key={item.id}><InfoRow icon="clipboard-check-outline" title={item.titulo} description={`Status atual: ${item.status.replace(/_/g, ' ')} · Protocolo ${item.protocolo}${item.observacaoAdmin?.trim() ? '\\nResposta da administração: ' + item.observacaoAdmin : ''}`}/></View>)
       }
-      <Text style={{ color: theme.colors.textSecondary, fontSize: 12, lineHeight: 19, marginTop: 14 }}>Este painel mostra o estado atual dos seus registros. Notificações push e histórico de mudanças ainda não estão disponíveis.</Text>
+      <Text style={{ color: theme.colors.textSecondary, fontSize: 12, lineHeight: 19, marginTop: 14 }}>As respostas da administração são exibidas aqui e nos detalhes da denúncia. Notificações push ainda não estão disponíveis.</Text>
     </Surface>
   </ScreenShell>;
 }
