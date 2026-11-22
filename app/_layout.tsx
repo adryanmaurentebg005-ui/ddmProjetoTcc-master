@@ -44,17 +44,19 @@ function SafeAreaShell({ children }: { children: ReactNode }) {
 }
 
 function RouteGuard() {
-  const { user, loading } = useAuth();
+  const { user, loading, isAdmin } = useAuth();
   const { isDark } = useAppTheme();
   const segments = useSegments();
   const inAuth = segments[0] === '(auth)';
+  const inAdmin = segments[0] === '(admin)';
 
   if (loading) {
     return <SafeAreaShell><View style={styles.loading}><ActivityIndicator size="large" /></View></SafeAreaShell>;
   }
 
   if (!user && !inAuth) return <Redirect href="/(auth)/login" />;
-  if (user && inAuth) return <Redirect href="/(citizen)/home" />;
+  if (user && inAuth) return <Redirect href={isAdmin ? '/(admin)/dashboard' : '/(citizen)/home'} />;
+  if (user && inAdmin && !isAdmin) return <Redirect href="/(citizen)/home" />;
 
   return (
     <SafeAreaShell>

@@ -7,11 +7,13 @@ import {
   updateProfile,
 } from 'firebase/auth';
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
-import { auth } from '../services/firebase';
+import { doc, getDoc } from 'firebase/firestore';
+import { auth, db } from '../services/firebase';
 
 interface AuthContextValue {
   user: User | null;
   loading: boolean;
+  isAdmin: boolean;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (name: string, email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
@@ -22,11 +24,26 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
 
-  useEffect(() => onAuthStateChanged(auth, (nextUser) => {
-    setUser(nextUser);
-    setLoading(false);
-  }), []);
+  useEffect(() => {
+    let sequence = 0;
+    return onAuthStateChanged(auth, async (nextUser) => {
+      const current = ++sequence;
+      setLoading(true);
+      setUser(nextUser);
+      setIsAdmin(false);
+      if (nextUser) {
+        try {
+          const snapshot = await getDoc(doc(db, 'administradores', nextUser.uid));
+          if (current === sequence) setIsAdmin(snapshot.exists() && snapshot.data().ativo === true);
+        } catch (error) {
+          console.warn('Não foi possível verificar permissão administrativa:', error);
+        }
+      }
+      if (current === sequence) setLoading(false);
+    });
+  }, []);
 
   const signIn = (email: string, password: string) => signInWithEmailAndPassword(auth, email.trim(), password).then(() => undefined);
 
@@ -37,7 +54,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = () => signOut(auth);
 
-  return <AuthContext.Provider value={{ user, loading, signIn, signUp, logout }}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={{ user, loading, isAdmin, signIn, signUp, logout }}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth() {
