@@ -16,7 +16,8 @@ interface LocationMapProps {
 }
 
 export default function LocationMap({ onConfirmLocation, onBack }: LocationMapProps) {
-  useAppTheme();
+  const { isDark } = useAppTheme();
+  const styles = React.useMemo(createStyles, [isDark]);
   const [latitude, setLatitude] = React.useState('');
   const [longitude, setLongitude] = React.useState('');
   const [address, setAddress] = React.useState('Localização manual ou por GPS');
@@ -90,7 +91,7 @@ export default function LocationMap({ onConfirmLocation, onBack }: LocationMapPr
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = () => StyleSheet.create({
   screen: { flex: 1, backgroundColor: theme.colors.background, padding: 20 },
   topControls: { flexDirection: 'row', alignItems: 'center', gap: 14, marginTop: 10, marginBottom: 24 },
   floatingButton: { width: 48, height: 48, borderRadius: 24, backgroundColor: theme.colors.surface, alignItems: 'center', justifyContent: 'center' },

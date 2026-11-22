@@ -41,7 +41,8 @@ function formatAddress(place: Location.LocationGeocodedAddress | undefined, lati
 }
 
 export default function LocationMap({ initialLocation, onLocationChange, onConfirmLocation, onBack }: LocationMapProps) {
-  useAppTheme();
+  const { isDark } = useAppTheme();
+  const styles = React.useMemo(createStyles, [isDark]);
   const cameraRef = useRef<CameraRef>(null);
   const geocodeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const geocodeRequest = useRef(0);
@@ -206,7 +207,7 @@ export default function LocationMap({ initialLocation, onLocationChange, onConfi
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = () => StyleSheet.create({
   screen: { flex: 1, backgroundColor: theme.colors.background },
   marker: { alignItems: 'center', justifyContent: 'center' },
   loadingOverlay: { ...StyleSheet.absoluteFill, alignItems: 'center', justifyContent: 'center' },

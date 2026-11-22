@@ -12,7 +12,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAppTheme } from '../../../contexts/ThemeContext';
 
 export default function DenunciaDetailScreen() {
-  useAppTheme();
+  const { isDark } = useAppTheme();
+  const styles = React.useMemo(createStyles, [isDark]);
   const insets = useSafeAreaInsets();
   const { id } = useLocalSearchParams<{ id: string }>();
   const [denuncia, setDenuncia] = React.useState<Denuncia | null>(null);
@@ -214,7 +215,7 @@ export default function DenunciaDetailScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = () => StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: theme.colors.background,

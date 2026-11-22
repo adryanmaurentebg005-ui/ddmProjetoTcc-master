@@ -21,7 +21,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAppTheme } from '../../../contexts/ThemeContext';
 
 export default function NovaDenunciaScreen() {
-  useAppTheme();
+  const { isDark } = useAppTheme();
+  const styles = React.useMemo(createStyles, [isDark]);
   const insets = useSafeAreaInsets();
   const params = useLocalSearchParams<{
     latitude?: string;
@@ -282,7 +283,7 @@ export default function NovaDenunciaScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = () => StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F3F6FC',
