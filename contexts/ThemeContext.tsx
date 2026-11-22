@@ -31,9 +31,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   const isDark = mode === 'dark' || (mode === 'automatic' && systemScheme === 'dark');
 
-  React.useEffect(() => {
-    applyTheme(isDark ? 'dark' : 'light');
-  }, [isDark]);
+  // Synchronize the shared palette before descendants render on mode changes.
+  applyTheme(isDark ? 'dark' : 'light');
 
   const setMode = async (nextMode: ThemeMode) => {
     setModeState(nextMode);
