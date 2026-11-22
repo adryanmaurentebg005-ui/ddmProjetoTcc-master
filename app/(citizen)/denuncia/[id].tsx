@@ -3,7 +3,9 @@ import React from 'react';
 import { ActivityIndicator, Image, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { StatusBadge } from '../../../components/StatusBadge';
-import { atualizarDenuncia, buscarDenuncia } from '../../../services/denuncias';
+import { atualizarDenuncia } from '../../../services/denuncias';
+import { doc, onSnapshot } from 'firebase/firestore';
+import { db } from '../../../services/firebase';
 import { useAuth } from '../../../contexts/AuthContext';
 import { Denuncia } from '../../../types';
 import { theme } from '../../../constants/theme';
@@ -32,9 +34,16 @@ export default function DenunciaDetailScreen() {
   React.useEffect(() => {
     let active = true;
     setLoading(true);
-    if (id) buscarDenuncia(id).then(item => { if (active) setDenuncia(item); }).catch(error => { console.error(error); if (active) setLoadError(true); }).finally(() => { if (active) setLoading(false); });
-    else setLoading(false);
-    return () => { active = false; };
+    if (!id) { setLoading(false); return; }
+    const unsubscribe = onSnapshot(doc(db, 'denuncias', id), snapshot => {
+      if (!active) return;
+      const data = snapshot.data();
+      if (!data) { setDenuncia(null); setLoading(false); return; }
+      const asIso = (value: any) => value?.toDate?.()?.toISOString?.() ?? String(value ?? '');
+      setDenuncia({ id: snapshot.id, titulo: String(data.titulo ?? ''), descricao: String(data.descricao ?? ''), categoriaId: String(data.categoriaId ?? 'outro'), protocolo: String(data.protocolo ?? snapshot.id), status: data.status ?? 'ENVIADA', usuarioId: String(data.usuarioId ?? ''), data: asIso(data.data), dataOcorrencia: asIso(data.dataOcorrencia ?? data.data), localizacao: data.localizacao ?? {}, fotos: Array.isArray(data.fotos) ? data.fotos : [], historico: [], observacaoAdmin: typeof data.observacaoAdmin === 'string' ? data.observacaoAdmin : undefined, atualizadoEm: asIso(data.atualizadoEm) });
+      setLoading(false); setLoadError(false);
+    }, error => { console.error(error); if (active) { setLoadError(true); setLoading(false); } });
+    return () => { active = false; unsubscribe(); };
   }, [id]);
 
   const handleEdit = () => {
@@ -96,6 +105,11 @@ export default function DenunciaDetailScreen() {
       </View>
 
       <StatusBadge status={denuncia.status} />
+      {denuncia.observacaoAdmin?.trim() ? <View style={[styles.card, { borderColor: theme.colors.primaryLight, backgroundColor: theme.colors.elevated }]} accessibilityRole="summary">
+        <Text style={{ color: theme.colors.primaryLight, fontWeight: '900', fontSize: 16 }}>Resposta da administração</Text>
+        <Text style={{ color: theme.colors.text, marginTop: 10, lineHeight: 23, fontSize: 15 }}>{denuncia.observacaoAdmin}</Text>
+        {denuncia.atualizadoEm && !Number.isNaN(new Date(denuncia.atualizadoEm).getTime()) ? <Text style={{ color: theme.colors.textSecondary, marginTop: 10, fontSize: 12 }}>Atualizada em {new Date(denuncia.atualizadoEm).toLocaleString('pt-BR')}</Text> : null}
+      </View> : null}
 
       <View style={styles.card}>
         <Text style={styles.label}>Protocolo</Text>
