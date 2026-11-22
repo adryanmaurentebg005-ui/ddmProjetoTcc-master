@@ -3,8 +3,10 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { theme } from '../../constants/theme';
 import { Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useAppTheme } from '../../contexts/ThemeContext';
 
 export default function CitizenLayout() {
+  useAppTheme();
   const insets = useSafeAreaInsets();
   return (
     <Tabs
@@ -12,55 +14,24 @@ export default function CitizenLayout() {
         headerShown: false,
         tabBarActiveTintColor: theme.colors.primaryLight,
         tabBarInactiveTintColor: theme.colors.textSecondary,
+        tabBarHideOnKeyboard: true,
         tabBarStyle: {
-          height: Platform.OS === 'ios' ? 78 : 68,
-          paddingTop: 8,
-          paddingBottom: Platform.OS === 'ios' ? 20 : 8,
+          height: 64 + Math.max(insets.bottom, Platform.OS === 'android' ? 12 : 16),
+          paddingTop: 9,
+          paddingBottom: Math.max(insets.bottom, Platform.OS === 'android' ? 12 : 16),
           backgroundColor: theme.colors.surface,
           borderTopColor: theme.colors.border,
           borderTopWidth: 1,
-          elevation: 12,
+          elevation: 5,
         },
-        tabBarLabelStyle: { fontSize: 12, fontWeight: '600' },
+        tabBarLabelStyle: { fontSize: 11, fontWeight: '700', marginTop: 3 },
       }}
     >
-      <Tabs.Screen
-        name="home"
-        options={{
-          title: 'Início',
-          tabBarIcon: ({ color, size }) => <MaterialCommunityIcons name="home-outline" size={size} color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="minhas-denuncias"
-        options={{
-          title: 'Denúncias',
-          tabBarIcon: ({ color, size }) => <MaterialCommunityIcons name="file-document-outline" size={size} color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="mapa"
-        options={{
-          href: null,
-          title: 'Mapa',
-          tabBarIcon: ({ color, size }) => <MaterialCommunityIcons name="map-outline" size={size} color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="notificacoes"
-        options={{
-          href: null,
-          title: 'Notificações',
-          tabBarIcon: ({ color, size }) => <MaterialCommunityIcons name="bell-outline" size={size} color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="perfil"
-        options={{
-          title: 'Perfil',
-          tabBarIcon: ({ color, size }) => <MaterialCommunityIcons name="account-circle-outline" size={size} color={color} />,
-        }}
-      />
+      <Tabs.Screen name="home" options={{ title: 'Início', tabBarIcon: ({ color, focused }) => <MaterialCommunityIcons name={focused ? 'home-variant' : 'home-variant-outline'} size={25} color={color} /> }} />
+      <Tabs.Screen name="minhas-denuncias" options={{ title: 'Registros', tabBarIcon: ({ color, focused }) => <MaterialCommunityIcons name={focused ? 'clipboard-text' : 'clipboard-text-outline'} size={24} color={color} /> }} />
+      <Tabs.Screen name="mapa" options={{ title: "Locais", tabBarIcon: ({ color, focused }) => <MaterialCommunityIcons name={focused ? "map-marker" : "map-marker-outline"} size={24} color={color} /> }} />
+      <Tabs.Screen name="notificacoes" options={{ title: "Atualizações", tabBarIcon: ({ color, focused }) => <MaterialCommunityIcons name={focused ? "bell" : "bell-outline"} size={24} color={color} /> }} />
+      <Tabs.Screen name="perfil" options={{ title: 'Perfil', tabBarIcon: ({ color, focused }) => <MaterialCommunityIcons name={focused ? 'account-circle' : 'account-circle-outline'} size={24} color={color} /> }} />
       <Tabs.Screen name="denuncia/nova" options={{ href: null }} />
       <Tabs.Screen name="denuncia/localizacao" options={{ href: null }} />
       <Tabs.Screen name="denuncia/[id]" options={{ href: null }} />

@@ -27,6 +27,6 @@ export default function Localizacao() {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: '#E5E7EB',
+    backgroundColor: '#EDF3FC',
   },
 });

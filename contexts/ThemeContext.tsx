@@ -15,7 +15,7 @@ const STORAGE_KEY = 'denuncia-urbana-theme';
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [mode, setModeState] = React.useState<ThemeMode>('automatic');
   const [systemScheme, setSystemScheme] = React.useState<ColorSchemeName>(Appearance.getColorScheme() ?? 'light');
-  const [hydrated, setHydrated] = React.useState(false);
+  const [, setHydrated] = React.useState(false);
 
   React.useEffect(() => {
     void AsyncStorage.getItem(STORAGE_KEY).then((saved) => {
@@ -31,9 +31,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   const isDark = mode === 'dark' || (mode === 'automatic' && systemScheme === 'dark');
 
-  React.useEffect(() => {
-    applyTheme(isDark ? 'dark' : 'light');
-  }, [isDark]);
+  // Synchronize the shared palette before descendants render on mode changes.
+  applyTheme(isDark ? 'dark' : 'light');
 
   const setMode = async (nextMode: ThemeMode) => {
     setModeState(nextMode);
@@ -42,7 +41,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <ThemeContext.Provider value={{ mode, isDark, setMode }}>
-      {hydrated ? children : children}
+      {children}
     </ThemeContext.Provider>
   );
 }

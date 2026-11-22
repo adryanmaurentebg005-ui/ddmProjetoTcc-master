@@ -1,40 +1,7 @@
-import { StyleSheet, Text, View } from 'react-native';
-import { theme } from '../../constants/theme';
-import { useAppTheme } from '../../contexts/ThemeContext';
-
+import { ScreenShell, Surface, InfoRow } from '../../components/ScreenShell';
 export default function AdminDashboardScreen() {
-  useAppTheme();
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Dashboard administrativo</Text>
-      <View style={styles.card}>
-        <Text style={styles.cardText}>Usuários, categorias, relatórios e configurações do sistema.</Text>
-      </View>
-    </View>
-  );
+  return <ScreenShell title="Administração" subtitle="Painel de gestão do sistema." icon="shield-crown-outline">
+    <Surface><InfoRow icon="account-group-outline" title="Gestão de usuários" description="A gestão de papéis e permissões precisa de um serviço administrativo autenticado."/></Surface>
+    <Surface><InfoRow icon="chart-box-outline" title="Relatórios" description="As métricas globais serão exibidas quando o backend administrativo estiver integrado."/></Surface>
+  </ScreenShell>;
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: theme.colors.background,
-    padding: 20,
-    justifyContent: 'center',
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: '800',
-    color: theme.colors.primary,
-    marginBottom: 18,
-  },
-  card: {
-    backgroundColor: theme.colors.surface,
-    borderRadius: 16,
-    padding: 18,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-  },
-  cardText: {
-    color: theme.colors.textSecondary,
-  },
-});

@@ -8,12 +8,17 @@ import { useAuth } from '../../../contexts/AuthContext';
 import { Denuncia } from '../../../types';
 import { theme } from '../../../constants/theme';
 import { CATEGORIAS_DENUNCIA, getNomeCategoria } from '../../../constants/categorias';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAppTheme } from '../../../contexts/ThemeContext';
 
 export default function DenunciaDetailScreen() {
-  useAppTheme();
+  const { isDark } = useAppTheme();
+  const styles = React.useMemo(createStyles, [isDark]);
+  const insets = useSafeAreaInsets();
   const { id } = useLocalSearchParams<{ id: string }>();
   const [denuncia, setDenuncia] = React.useState<Denuncia | null>(null);
+  const [loading, setLoading] = React.useState(true);
+  const [loadError, setLoadError] = React.useState(false);
   const [modalVisible, setModalVisible] = React.useState(false);
   const [editedTitulo, setEditedTitulo] = React.useState('');
   const [editedDescricao, setEditedDescricao] = React.useState('');
@@ -25,7 +30,11 @@ export default function DenunciaDetailScreen() {
   const { user } = useAuth();
 
   React.useEffect(() => {
-    if (id) buscarDenuncia(id).then(setDenuncia).catch(console.error);
+    let active = true;
+    setLoading(true);
+    if (id) buscarDenuncia(id).then(item => { if (active) setDenuncia(item); }).catch(error => { console.error(error); if (active) setLoadError(true); }).finally(() => { if (active) setLoading(false); });
+    else setLoading(false);
+    return () => { active = false; };
   }, [id]);
 
   const handleEdit = () => {
@@ -76,7 +85,8 @@ export default function DenunciaDetailScreen() {
     }
   };
 
-  if (!denuncia) return <View style={styles.loading}><ActivityIndicator size="large" color={theme.colors.primaryLight} /></View>;
+  if (loading) return <View style={styles.loading}><ActivityIndicator size="large" color={theme.colors.primaryLight} /></View>;
+  if (!denuncia) return <View style={styles.loading}><Text style={{ color: theme.colors.text }}>{loadError ? 'Falha ao carregar a ocorrência.' : 'Ocorrência não encontrada.'}</Text></View>;
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
@@ -116,7 +126,7 @@ export default function DenunciaDetailScreen() {
           <Text style={styles.value}>Nenhuma foto anexada.</Text>
         )}
 
-        {editSuccess && <Text style={styles.successMessage}>{editSuccess}</Text>}
+        {editSuccess && <Text style={[styles.successMessage, { backgroundColor: theme.colors.elevated }]}>{editSuccess}</Text>}
 
         <Pressable style={styles.editButton} onPress={handleEdit}>
           <Text style={styles.editButtonText}>Editar</Text>
@@ -124,13 +134,13 @@ export default function DenunciaDetailScreen() {
       </View>
 
       <Modal
-        animationType="slide"
+        animationType="fade"
         transparent={true}
         visible={modalVisible}
         onRequestClose={() => setModalVisible(false)}
       >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
+        <View style={[styles.modalOverlay, { paddingBottom: Math.max(insets.bottom, 16) }]}>
+          <View style={[styles.modalContent, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border, maxHeight: '85%' }]}>
             <Text style={styles.modalTitle}>Editar denúncia</Text>
 
             <Text style={styles.label}>Título *</Text>
@@ -182,7 +192,7 @@ export default function DenunciaDetailScreen() {
         onRequestClose={() => setCategoryModalVisible(false)}
       >
         <View style={styles.modalOverlay}>
-          <View style={[styles.modalContent, styles.categoryModalContent]}>
+          <View style={[styles.modalContent, styles.categoryModalContent, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border, maxHeight: '85%' }]}>
             <Text style={styles.modalTitle}>Selecione a categoria</Text>
             {CATEGORIAS_DENUNCIA.map((item) => (
               <Pressable
@@ -205,7 +215,7 @@ export default function DenunciaDetailScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = () => StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: theme.colors.background,
@@ -222,12 +232,12 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 28,
-    fontWeight: '800',
+    fontWeight: '900',
     color: theme.colors.primary,
   },
   card: {
     backgroundColor: theme.colors.surface,
-    borderRadius: 18,
+    borderRadius: 24,
     padding: 18,
     marginTop: 18,
     borderWidth: 1,
@@ -251,20 +261,20 @@ const styles = StyleSheet.create({
   photo: {
     width: '100%',
     height: 220,
-    borderRadius: 12,
+    borderRadius: 15,
     marginTop: 8,
     backgroundColor: theme.colors.border,
   },
   editButton: {
     marginTop: 12,
-    backgroundColor: theme.colors.primary,
-    borderRadius: 8,
+    backgroundColor: theme.colors.primaryLight,
+    borderRadius: 15,
     paddingVertical: 10,
     paddingHorizontal: 16,
     alignItems: 'center',
   },
   editButtonText: {
-    color: theme.colors.surface,
+    color: '#FFFFFF',
     fontWeight: '700',
   },
   modalOverlay: {
@@ -284,7 +294,7 @@ const styles = StyleSheet.create({
   },
   modalTitle: {
     fontSize: 22,
-    fontWeight: '800',
+    fontWeight: '900',
     color: theme.colors.primary,
     marginBottom: 16,
   },
