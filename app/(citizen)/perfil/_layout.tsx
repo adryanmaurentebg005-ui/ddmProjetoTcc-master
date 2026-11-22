@@ -1,21 +1,26 @@
-import { Stack } from 'expo-router';
+import { Drawer } from 'expo-router/drawer';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { useAuth } from '../../../contexts/AuthContext';
 import { theme } from '../../../constants/theme';
-import { useAppTheme } from '../../../contexts/ThemeContext';
 
 export default function PerfilLayout() {
-  useAppTheme();
-  return <Stack screenOptions={{
-    headerShown: true,
-    headerStyle: { backgroundColor: theme.colors.background },
-    headerTintColor: theme.colors.text,
-    headerShadowVisible: false,
-    headerTitleStyle: { fontWeight: '800' },
-    contentStyle: { backgroundColor: theme.colors.background },
-  }}>
-    <Stack.Screen name="index" options={{ headerShown: false }} />
-    <Stack.Screen name="configuracoes" options={{ title: 'Configurações' }} />
-    <Stack.Screen name="ajuda" options={{ title: 'Ajuda' }} />
-    <Stack.Screen name="sobre" options={{ title: 'Sobre' }} />
-    <Stack.Screen name="sair" options={{ headerShown: false }} />
-  </Stack>;
+  const { logout } = useAuth();
+
+  return (
+    <Drawer
+      screenOptions={{
+        headerShown: false,
+        drawerActiveTintColor: theme.colors.primaryLight,
+        drawerLabelStyle: { color: theme.colors.text, fontSize: 14, fontWeight: '600' },
+        drawerStyle: { backgroundColor: theme.colors.surface, borderRightWidth: 1, borderRightColor: theme.colors.border },
+        drawerContentStyle: { backgroundColor: theme.colors.surface },
+      }}
+    >
+      <Drawer.Screen name="index" options={{ title: 'Perfil', drawerIcon: ({ color, size }) => <MaterialIcons name="person-outline" color={color} size={size} /> }} />
+      <Drawer.Screen name="configuracoes" options={{ title: 'Configurações', drawerIcon: ({ color, size }) => <MaterialIcons name="settings" color={color} size={size} /> }} />
+      <Drawer.Screen name="ajuda" options={{ title: 'Ajuda', drawerIcon: ({ color, size }) => <MaterialIcons name="help-outline" color={color} size={size} /> }} />
+      <Drawer.Screen name="sobre" options={{ title: 'Sobre o aplicativo', drawerIcon: ({ color, size }) => <MaterialIcons name="info-outline" color={color} size={size} /> }} />
+      <Drawer.Screen name="sair" options={{ title: 'Sair', drawerIcon: ({ color, size }) => <MaterialIcons name="logout" color={color} size={size} />, drawerItemStyle: { marginTop: 'auto' } }} listeners={{ drawerItemPress: (event) => { event.preventDefault(); void logout(); } }} />
+    </Drawer>
+  );
 }

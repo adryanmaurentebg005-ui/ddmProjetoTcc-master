@@ -24,9 +24,6 @@ export function Button({ title, variant = 'primary', style, icon, loading, disab
       style={({ pressed }) => [
         styles.button,
         variantStyle,
-        variant === 'primary' && { backgroundColor: theme.colors.primaryLight },
-        variant === 'secondary' && { backgroundColor: theme.colors.surface, borderColor: theme.colors.border },
-        variant === 'danger' && { backgroundColor: theme.colors.error },
         style,
         pressed && styles.pressed,
         (disabled || loading) && styles.disabled,
@@ -34,15 +31,14 @@ export function Button({ title, variant = 'primary', style, icon, loading, disab
       {...props}
     >
       {icon}
-      <Text style={[styles.text, variant === 'secondary' && styles.secondaryText, variant === 'secondary' && { color: theme.colors.text }]}>{loading ? 'Aguarde...' : title}</Text>
+      <Text style={[styles.text, variant === 'secondary' && styles.secondaryText]}>{loading ? 'Aguarde...' : title}</Text>
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
   button: {
-    borderRadius: 15,
-    minHeight: 51,
+    borderRadius: theme.radii.md,
     paddingVertical: 14,
     alignItems: 'center',
     justifyContent: 'center',

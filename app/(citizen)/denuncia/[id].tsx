@@ -14,8 +14,6 @@ export default function DenunciaDetailScreen() {
   useAppTheme();
   const { id } = useLocalSearchParams<{ id: string }>();
   const [denuncia, setDenuncia] = React.useState<Denuncia | null>(null);
-  const [loading, setLoading] = React.useState(true);
-  const [loadError, setLoadError] = React.useState(false);
   const [modalVisible, setModalVisible] = React.useState(false);
   const [editedTitulo, setEditedTitulo] = React.useState('');
   const [editedDescricao, setEditedDescricao] = React.useState('');
@@ -27,11 +25,7 @@ export default function DenunciaDetailScreen() {
   const { user } = useAuth();
 
   React.useEffect(() => {
-    let active = true;
-    setLoading(true);
-    if (id) buscarDenuncia(id).then(item => { if (active) setDenuncia(item); }).catch(error => { console.error(error); if (active) setLoadError(true); }).finally(() => { if (active) setLoading(false); });
-    else setLoading(false);
-    return () => { active = false; };
+    if (id) buscarDenuncia(id).then(setDenuncia).catch(console.error);
   }, [id]);
 
   const handleEdit = () => {
@@ -82,8 +76,7 @@ export default function DenunciaDetailScreen() {
     }
   };
 
-  if (loading) return <View style={styles.loading}><ActivityIndicator size="large" color={theme.colors.primaryLight} /></View>;
-  if (!denuncia) return <View style={styles.loading}><Text style={{ color: theme.colors.text }}>{loadError ? 'Falha ao carregar a ocorrência.' : 'Ocorrência não encontrada.'}</Text></View>;
+  if (!denuncia) return <View style={styles.loading}><ActivityIndicator size="large" color={theme.colors.primaryLight} /></View>;
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
@@ -229,7 +222,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 28,
-    fontWeight: '900',
+    fontWeight: '800',
     color: theme.colors.primary,
   },
   card: {
@@ -258,7 +251,7 @@ const styles = StyleSheet.create({
   photo: {
     width: '100%',
     height: 220,
-    borderRadius: 15,
+    borderRadius: 12,
     marginTop: 8,
     backgroundColor: theme.colors.border,
   },
@@ -291,7 +284,7 @@ const styles = StyleSheet.create({
   },
   modalTitle: {
     fontSize: 22,
-    fontWeight: '900',
+    fontWeight: '800',
     color: theme.colors.primary,
     marginBottom: 16,
   },

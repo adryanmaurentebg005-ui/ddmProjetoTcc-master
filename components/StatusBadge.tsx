@@ -3,27 +3,40 @@ import { StyleSheet, Text, View } from 'react-native';
 import { DenunciaStatus } from '../types';
 import { theme } from '../constants/theme';
 
-const statusMap: Record<DenunciaStatus, { label: string; tone: 'info' | 'warning' | 'success' | 'error' }> = {
-  ENVIADA: { label: 'Enviada', tone: 'info' },
-  EM_ANALISE: { label: 'Em análise', tone: 'warning' },
-  AGUARDANDO_INFORMACOES: { label: 'Aguardando informações', tone: 'warning' },
-  VALIDADA: { label: 'Validada', tone: 'success' },
-  EM_ATENDIMENTO: { label: 'Em atendimento', tone: 'info' },
-  RESOLVIDA: { label: 'Resolvida', tone: 'success' },
-  REJEITADA: { label: 'Rejeitada', tone: 'error' },
+const statusMap: Record<DenunciaStatus, { label: string; color: string; background: string }> = {
+  ENVIADA: { label: 'Enviada', color: theme.colors.info, background: '#EAF3FF' },
+  EM_ANALISE: { label: 'Em análise', color: theme.colors.warning, background: '#FFF4DF' },
+  AGUARDANDO_INFORMACOES: { label: 'Aguardando informações', color: theme.colors.warning, background: '#FFF4DF' },
+  VALIDADA: { label: 'Validada', color: theme.colors.success, background: '#EAF7EE' },
+  EM_ATENDIMENTO: { label: 'Em atendimento', color: theme.colors.primaryLight, background: '#EAF3FF' },
+  RESOLVIDA: { label: 'Resolvida', color: theme.colors.success, background: '#EAF7EE' },
+  REJEITADA: { label: 'Rejeitada', color: theme.colors.error, background: '#FDECEC' },
 };
 
-export function StatusBadge({ status }: { status: DenunciaStatus }) {
-  const config = statusMap[status] ?? { label: 'Status desconhecido', tone: 'info' as const };
-  const color = theme.colors[config.tone];
-  return <View style={[styles.badge, { backgroundColor: theme.colors.elevated, borderColor: theme.colors.border }]}>
-    <View style={[styles.dot, { backgroundColor: color }]}/>
-    <Text style={[styles.text, { color }]} numberOfLines={1}>{config.label}</Text>
-  </View>;
+interface StatusBadgeProps {
+  status: DenunciaStatus;
+}
+
+export function StatusBadge({ status }: StatusBadgeProps) {
+  const config = statusMap[status];
+
+  return (
+    <View style={[styles.badge, { backgroundColor: config.background }]}>
+      <Text style={[styles.text, { color: config.color }]}>{config.label}</Text>
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
-  badge: { alignSelf: 'flex-start', maxWidth: '72%', borderRadius: 999, paddingHorizontal: 10, paddingVertical: 7, borderWidth: 1, flexDirection: 'row', alignItems: 'center', gap: 6 },
-  dot: { width: 6, height: 6, borderRadius: 3 },
-  text: { fontSize: 10, fontWeight: '800', flexShrink: 1 },
+  badge: {
+    alignSelf: 'flex-start',
+    flexShrink: 0,
+    borderRadius: theme.radii.pill,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+  },
+  text: {
+    fontSize: 11,
+    fontWeight: '700',
+  },
 });
