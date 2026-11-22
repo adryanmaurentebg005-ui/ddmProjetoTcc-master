@@ -8,8 +8,11 @@ import { useAuth } from '../../contexts/AuthContext';
 import { observarDenunciasDoUsuario, excluirDenuncia } from '../../services/denuncias';
 import { Denuncia } from '../../types';
 import { theme } from '../../constants/theme';
+import { getNomeCategoria } from '../../constants/categorias';
+import { useAppTheme } from '../../contexts/ThemeContext';
 
 export default function MinhasDenunciasScreen() {
+  useAppTheme();
   const { success } = useLocalSearchParams<{ success?: string }>();
   const { user } = useAuth();
   const [denuncias, setDenuncias] = React.useState<Denuncia[]>([]);
@@ -99,6 +102,7 @@ export default function MinhasDenunciasScreen() {
               </View>
               <Text style={styles.cardText}>{item.descricao}</Text>
               <Text style={styles.cardMeta}>{item.localizacao.endereco}</Text>
+              <Text style={styles.cardMeta}>Categoria: {getNomeCategoria(item.categoriaId)}</Text>
               <Text style={styles.cardMeta}>Ocorrência em: {new Date(item.dataOcorrencia ?? item.data).toLocaleString('pt-BR')}</Text>
               <Text style={styles.cardMeta}>Enviada em: {new Date(item.data).toLocaleString('pt-BR')}</Text>
               <Text style={styles.cardMeta}>Protocolo: {item.protocolo}</Text>

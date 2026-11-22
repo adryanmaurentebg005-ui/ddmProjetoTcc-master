@@ -1,13 +1,16 @@
-import { Link, router } from 'expo-router';
+import { Link } from 'expo-router';
 import React from 'react';
-import { ActivityIndicator, StyleSheet, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { LinearGradient } from 'expo-linear-gradient';
+import { useAppTheme } from '../../contexts/ThemeContext';
 import { Button } from '../../components/Button';
 import { theme } from '../../constants/theme';
 import { getAuthErrorMessage, useAuth } from '../../contexts/AuthContext';
 
 export default function LoginScreen() {
   const { signIn } = useAuth();
+  const { isDark } = useAppTheme();
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
   const [error, setError] = React.useState<string | null>(null);
@@ -30,8 +33,16 @@ export default function LoginScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.card}>
+    <LinearGradient colors={isDark ? ['#090D18', '#111827', '#151D2E'] : ['#1D4ED8', '#2563EB', '#7C3AED']} style={styles.container}>
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.keyboard}>
+        <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+          <View style={styles.brandMark}>
+            <LinearGradient colors={['#60A5FA', '#22D3EE']} style={styles.brandIcon}>
+              <MaterialIcons name="gavel" size={30} color="#FFFFFF" />
+            </LinearGradient>
+            <Text style={styles.brandTitle}>Denúncia Urbana</Text>
+          </View>
+          <View style={styles.card}>
         <MaterialIcons name="account-circle" size={72} color={theme.colors.primary} />
         <Text style={styles.title}>Acesso ao sistema</Text>
         <Text style={styles.subtitle}>Entre com sua conta para acompanhar denúncias.</Text>
@@ -50,23 +61,27 @@ export default function LoginScreen() {
           <Text style={styles.helperText}>Não tem conta?</Text>
           <Link href="/(auth)/cadastro" style={styles.link}>Cadastre-se</Link>
         </View>
-      </View>
-    </View>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: theme.colors.primary,
-    justifyContent: 'center',
-    padding: 20,
-  },
+  container: { flex: 1 },
+  keyboard: { flex: 1 },
+  scroll: { flexGrow: 1, justifyContent: 'center', padding: 20 },
+  brandMark: { alignItems: 'center', marginBottom: 18 },
+  brandIcon: { width: 58, height: 58, borderRadius: 18, alignItems: 'center', justifyContent: 'center', marginBottom: 8 },
+  brandTitle: { color: '#FFFFFF', fontSize: 21, fontWeight: '700' },
   card: {
     backgroundColor: theme.colors.surface,
-    borderRadius: 24,
+    borderRadius: 20,
     padding: 24,
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: theme.colors.border,
   },
   title: {
     fontSize: 28,
@@ -93,7 +108,7 @@ const styles = StyleSheet.create({
     padding: 14,
     marginBottom: 14,
     fontSize: 16,
-    backgroundColor: '#fff',
+    backgroundColor: theme.colors.elevated,
     color: theme.colors.inputText,
   },
   row: {

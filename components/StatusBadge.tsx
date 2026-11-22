@@ -30,6 +30,7 @@ export function StatusBadge({ status }: StatusBadgeProps) {
 const styles = StyleSheet.create({
   badge: {
     alignSelf: 'flex-start',
+    flexShrink: 0,
     borderRadius: theme.radii.pill,
     paddingHorizontal: 10,
     paddingVertical: 6,

@@ -16,18 +16,11 @@ import { useAuth } from '../../../contexts/AuthContext';
 import { criarDenuncia } from '../../../services/denuncias';
 import { theme } from '../../../constants/theme';
 import { enviarImagemParaImgBB } from '../../../services/imagens';
-
-const categories = [
-  ['buraco', 'Buraco na via'],
-  ['iluminacao', 'Iluminação pública'],
-  ['lixo', 'Lixo e resíduos'],
-  ['calcada', 'Calçada'],
-  ['semaforo', 'Semáforo'],
-  ['alagamento', 'Alagamento'],
-  ['outro', 'Outro'],
-] as const;
+import { CATEGORIAS_DENUNCIA } from '../../../constants/categorias';
+import { useAppTheme } from '../../../contexts/ThemeContext';
 
 export default function NovaDenunciaScreen() {
+  useAppTheme();
   const params = useLocalSearchParams<{
     latitude?: string;
     longitude?: string;
@@ -51,7 +44,7 @@ export default function NovaDenunciaScreen() {
   const [photoUri, setPhotoUri] = React.useState<string | null>(null);
   const [photoUploading, setPhotoUploading] = React.useState(false);
   const [photoBase64, setPhotoBase64] = React.useState<string | null>(null);
-  const categoryName = categories.find(([id]) => id === category)?.[1] ?? 'Outro';
+  const categoryName = CATEGORIAS_DENUNCIA.find((item) => item.id === category)?.nome ?? 'Outro';
 
   const openDatePicker = () => {
     setFallbackDate(registrationDate.toLocaleDateString('pt-BR'));
@@ -259,7 +252,7 @@ export default function NovaDenunciaScreen() {
         <View style={styles.modalBackdrop}>
           <View style={styles.modalCard}>
             <Text style={styles.modalTitle}>Selecione a categoria</Text>
-            {categories.map(([id, name]) => <Pressable key={id} style={styles.modalOption} onPress={() => { setCategory(id); setShowCategoryModal(false); }}><Text style={styles.modalOptionText}>{name}</Text></Pressable>)}
+            {CATEGORIAS_DENUNCIA.map((item) => <Pressable key={item.id} style={styles.modalOption} onPress={() => { setCategory(item.id); setShowCategoryModal(false); }}><Text style={styles.modalOptionText}>{item.nome}</Text></Pressable>) }
           </View>
         </View>
       </Modal>

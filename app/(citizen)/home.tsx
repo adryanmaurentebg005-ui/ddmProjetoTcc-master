@@ -1,6 +1,8 @@
 import { Link } from 'expo-router';
 import React from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { useAppTheme } from '../../contexts/ThemeContext';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { Button } from '../../components/Button';
 import { StatusBadge } from '../../components/StatusBadge';
@@ -11,6 +13,7 @@ import { theme } from '../../constants/theme';
 
 export default function CitizenHomeScreen() {
   const { user } = useAuth();
+  useAppTheme();
   const [denuncias, setDenuncias] = React.useState<Denuncia[]>([]);
   const [loading, setLoading] = React.useState(true);
 
@@ -38,13 +41,13 @@ export default function CitizenHomeScreen() {
           <MaterialIcons name="notifications" size={24} color={theme.colors.primary} />
         </View>
 
-        <View style={styles.heroCard}>
+        <LinearGradient colors={['#1D4ED8', '#2563EB', '#7C3AED']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.heroCard}>
           <Text style={styles.heroLabel}>Olá, {user?.displayName ?? 'cidadão'}</Text>
           <Text style={styles.heroText}>Sua cidade melhor começa com uma denúncia bem informada.</Text>
           <Link href="/(citizen)/denuncia/localizacao" asChild>
             <Button title="Nova denúncia" style={styles.button} />
           </Link>
-        </View>
+        </LinearGradient>
 
         <Text style={styles.sectionTitle}>Minhas denúncias</Text>
 
@@ -89,10 +92,11 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   heroCard: {
-    backgroundColor: theme.colors.primary,
+    backgroundColor: 'transparent',
     borderRadius: 20,
     padding: 22,
     marginBottom: 24,
+    ...theme.shadow.card,
   },
   heroLabel: {
     color: '#fff',

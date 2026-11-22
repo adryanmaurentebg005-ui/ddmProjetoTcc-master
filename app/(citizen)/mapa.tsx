@@ -1,8 +1,10 @@
 import { StyleSheet, Text, View } from 'react-native';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { theme } from '../../constants/theme';
+import { useAppTheme } from '../../contexts/ThemeContext';
 
 export default function MapaScreen() {
+  useAppTheme();
   return (
     <View style={styles.container}>
       <View style={styles.header}>

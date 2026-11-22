@@ -4,14 +4,18 @@ import { ActivityIndicator, Platform, StyleSheet, View } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { useEffect, type ReactNode } from 'react';
 import { AuthProvider, useAuth } from '../contexts/AuthContext';
+import { ThemeProvider, useAppTheme } from '../contexts/ThemeContext';
+import { theme } from '../constants/theme';
 
 export default function RootLayout() {
   return (
     <SafeAreaProvider>
       <WebSafeArea />
-      <AuthProvider>
-        <RouteGuard />
-      </AuthProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <RouteGuard />
+        </AuthProvider>
+      </ThemeProvider>
     </SafeAreaProvider>
   );
 }
@@ -40,6 +44,7 @@ function SafeAreaShell({ children }: { children: ReactNode }) {
 
 function RouteGuard() {
   const { user, loading } = useAuth();
+  const { isDark } = useAppTheme();
   const segments = useSegments();
   const inAuth = segments[0] === '(auth)';
 
@@ -52,8 +57,8 @@ function RouteGuard() {
 
   return (
     <SafeAreaShell>
-      <StatusBar style="light" />
-      <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#F5F7FA' } }} />
+      <StatusBar style={isDark ? 'light' : 'dark'} />
+      <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: theme.colors.background } }} />
     </SafeAreaShell>
   );
 }
@@ -61,7 +66,7 @@ function RouteGuard() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F5F7FA',
+    backgroundColor: theme.colors.background,
   },
   loading: {
     flex: 1,

@@ -1,7 +1,9 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { theme } from '../../constants/theme';
+import { useAppTheme } from '../../contexts/ThemeContext';
 
 export default function AdminDashboardScreen() {
+  useAppTheme();
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Dashboard administrativo</Text>

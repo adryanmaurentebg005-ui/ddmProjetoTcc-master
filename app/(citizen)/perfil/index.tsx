@@ -1,10 +1,12 @@
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { DrawerToggleButton } from 'expo-router/drawer';
 import { StyleSheet, Text, View } from 'react-native';
+import { useAppTheme } from '../../../contexts/ThemeContext';
 import { useAuth } from '../../../contexts/AuthContext';
 import { theme } from '../../../constants/theme';
 
 export default function PerfilScreen() {
+  useAppTheme();
   const { user } = useAuth();
 
   return (

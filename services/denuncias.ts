@@ -100,7 +100,13 @@ export async function excluirDenuncia(id: string, usuarioId: string) {
   await deleteDoc(reference);
 }
 
-export async function atualizarDenuncia(id: string, usuarioId: string, dadosAtualizados: Partial<Denuncia>) {
+export type DadosAtualizacaoDenuncia = {
+  titulo: string;
+  descricao: string;
+  categoriaId: string;
+};
+
+export async function atualizarDenuncia(id: string, usuarioId: string, dadosAtualizados: DadosAtualizacaoDenuncia) {
   const reference = doc(db, 'denuncias', id);
   const snapshot = await getDoc(reference);
   if (!snapshot.exists() || snapshot.data().usuarioId !== usuarioId) {

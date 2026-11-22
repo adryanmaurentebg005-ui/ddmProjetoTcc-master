@@ -1,6 +1,8 @@
 import { Link } from 'expo-router';
 import React from 'react';
-import { ActivityIndicator, StyleSheet, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { useAppTheme } from '../../contexts/ThemeContext';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { Button } from '../../components/Button';
 import { theme } from '../../constants/theme';
@@ -8,6 +10,7 @@ import { getAuthErrorMessage, useAuth } from '../../contexts/AuthContext';
 
 export default function CadastroScreen() {
   const { signUp } = useAuth();
+  const { isDark } = useAppTheme();
   const [name, setName] = React.useState('');
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
@@ -31,7 +34,9 @@ export default function CadastroScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <LinearGradient colors={isDark ? ['#090D18', '#111827', '#151D2E'] : ['#1D4ED8', '#2563EB', '#7C3AED']} style={styles.container}>
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.keyboard}>
+        <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
       <View style={styles.card}>
         <MaterialIcons name="person-add" size={68} color={theme.colors.primary} />
         <Text style={styles.title}>Criar conta</Text>
@@ -54,21 +59,22 @@ export default function CadastroScreen() {
           <Link href="/(auth)/login" style={styles.link}>Entrar</Link>
         </View>
       </View>
-    </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: theme.colors.background,
-    justifyContent: 'center',
-    padding: 20,
-  },
+  container: { flex: 1 },
+  keyboard: { flex: 1 },
+  scroll: { flexGrow: 1, justifyContent: 'center', padding: 20 },
   card: {
     backgroundColor: theme.colors.surface,
-    borderRadius: 24,
+    borderRadius: 20,
     padding: 24,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
   },
   title: {
     fontSize: 28,
@@ -88,7 +94,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 14,
     marginBottom: 14,
-    backgroundColor: '#fff',
+    backgroundColor: theme.colors.elevated,
     color: theme.colors.inputText,
   },
   row: {

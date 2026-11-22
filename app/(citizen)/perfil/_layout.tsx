@@ -11,7 +11,9 @@ export default function PerfilLayout() {
       screenOptions={{
         headerShown: false,
         drawerActiveTintColor: theme.colors.primaryLight,
-        drawerLabelStyle: { color: theme.colors.text },
+        drawerLabelStyle: { color: theme.colors.text, fontSize: 14, fontWeight: '600' },
+        drawerStyle: { backgroundColor: theme.colors.surface, borderRightWidth: 1, borderRightColor: theme.colors.border },
+        drawerContentStyle: { backgroundColor: theme.colors.surface },
       }}
     >
       <Drawer.Screen name="index" options={{ title: 'Perfil', drawerIcon: ({ color, size }) => <MaterialIcons name="person-outline" color={color} size={size} /> }} />

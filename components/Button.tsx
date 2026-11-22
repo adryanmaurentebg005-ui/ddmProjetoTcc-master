@@ -6,9 +6,11 @@ interface ButtonProps extends PressableProps {
   title: string;
   variant?: 'primary' | 'secondary' | 'danger';
   style?: ViewStyle;
+  icon?: React.ReactNode;
+  loading?: boolean;
 }
 
-export function Button({ title, variant = 'primary', style, ...props }: ButtonProps) {
+export function Button({ title, variant = 'primary', style, icon, loading, disabled, ...props }: ButtonProps) {
   const variantStyle = {
     primary: styles.primary,
     secondary: styles.secondary,
@@ -16,8 +18,20 @@ export function Button({ title, variant = 'primary', style, ...props }: ButtonPr
   }[variant];
 
   return (
-    <Pressable style={[styles.button, variantStyle, style]} {...props}>
-      <Text style={styles.text}>{title}</Text>
+    <Pressable
+      accessibilityRole="button"
+      disabled={disabled || loading}
+      style={({ pressed }) => [
+        styles.button,
+        variantStyle,
+        style,
+        pressed && styles.pressed,
+        (disabled || loading) && styles.disabled,
+      ]}
+      {...props}
+    >
+      {icon}
+      <Text style={[styles.text, variant === 'secondary' && styles.secondaryText]}>{loading ? 'Aguarde...' : title}</Text>
     </Pressable>
   );
 }
@@ -28,6 +42,8 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     alignItems: 'center',
     justifyContent: 'center',
+    flexDirection: 'row',
+    gap: 8,
   },
   primary: {
     backgroundColor: theme.colors.primaryLight,
@@ -41,8 +57,18 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.error,
   },
   text: {
-    color: theme.colors.surface,
+    color: '#FFFFFF',
     fontWeight: '700',
     fontSize: 15,
+  },
+  secondaryText: {
+    color: theme.colors.text,
+  },
+  pressed: {
+    transform: [{ scale: 0.985 }],
+    opacity: 0.92,
+  },
+  disabled: {
+    opacity: 0.55,
   },
 });
