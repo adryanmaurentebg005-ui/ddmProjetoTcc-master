@@ -144,7 +144,7 @@ export default function LocationMap({ initialLocation, onLocationChange, onConfi
         {selectedLocation && (
           <Marker id="selected-location" lngLat={[selectedLocation.longitude, selectedLocation.latitude]}>
             <View style={styles.marker}>
-              <MaterialCommunityIcons name="map-marker" size={42} color="#1976D2" />
+              <MaterialCommunityIcons name="map-marker" size={42} color="#285CC1" />
             </View>
           </Marker>
         )}
@@ -152,26 +152,26 @@ export default function LocationMap({ initialLocation, onLocationChange, onConfi
 
       {!mapReady && (
         <View style={styles.loadingOverlay} pointerEvents="none">
-          <ActivityIndicator color="#1976D2" />
+          <ActivityIndicator color="#285CC1" />
           <Text style={styles.loadingText}>Carregando mapa...</Text>
         </View>
       )}
       <View style={styles.topControls}>
         <Pressable style={styles.floatingButton} onPress={onBack} accessibilityLabel="Voltar">
-          <MaterialCommunityIcons name="arrow-left" size={24} color="#123B65" />
+          <MaterialCommunityIcons name="arrow-left" size={24} color="#17366B" />
         </Pressable>
       </View>
       <View style={styles.addressCard}>
-        <View style={styles.addressIcon}><MaterialCommunityIcons name="map-marker-radius" size={22} color="#1976D2" /></View>
+        <View style={styles.addressIcon}><MaterialCommunityIcons name="map-marker-radius" size={22} color="#285CC1" /></View>
         <View style={styles.addressContent}>
           <Text style={styles.cardLabel}>{state === 'loading-address' ? 'IDENTIFICANDO LOCAL' : 'LOCAL DA OCORRÊNCIA'}</Text>
           <Text style={styles.cardAddress}>{selectedLocation?.address ?? 'Precisamos da sua localização'}</Text>
         </View>
-        {state === 'loading-address' && <ActivityIndicator size="small" color="#1976D2" />}
+        {state === 'loading-address' && <ActivityIndicator size="small" color="#285CC1" />}
       </View>
       <View style={styles.mapControls}>
         <Pressable style={styles.floatingButton} onPress={() => void locateUser()} accessibilityLabel="Minha localização">
-          <MaterialCommunityIcons name="crosshairs-gps" size={24} color="#123B65" />
+          <MaterialCommunityIcons name="crosshairs-gps" size={24} color="#17366B" />
         </Pressable>
       </View>
       {error && (
@@ -183,7 +183,7 @@ export default function LocationMap({ initialLocation, onLocationChange, onConfi
       <View style={styles.bottomSheet}>
         <View style={styles.dragHandle} />
         <View style={styles.sheetHeader}>
-          <MaterialCommunityIcons name="map-marker-check" size={24} color="#1976D2" />
+          <MaterialCommunityIcons name="map-marker-check" size={24} color="#285CC1" />
           <View style={styles.sheetContent}>
             <Text style={styles.sheetTitle}>Local selecionado</Text>
             <Text style={styles.sheetAddress}>{selectedLocation?.address ?? 'Selecione um ponto no mapa'}</Text>
@@ -204,28 +204,28 @@ export default function LocationMap({ initialLocation, onLocationChange, onConfi
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: '#E5E7EB' },
+  screen: { flex: 1, backgroundColor: '#EDF3FC' },
   marker: { alignItems: 'center', justifyContent: 'center' },
   loadingOverlay: { ...StyleSheet.absoluteFill, alignItems: 'center', justifyContent: 'center' },
-  loadingText: { marginTop: 10, color: '#123B65', fontWeight: '700' },
+  loadingText: { marginTop: 10, color: '#17366B', fontWeight: '700' },
   topControls: { position: 'absolute', top: 18, left: 16 },
   floatingButton: { width: 48, height: 48, borderRadius: 24, backgroundColor: '#FFFFFF', alignItems: 'center', justifyContent: 'center', shadowColor: '#000', shadowOpacity: 0.16, shadowRadius: 8, shadowOffset: { width: 0, height: 3 }, elevation: 5 },
   addressCard: { position: 'absolute', top: 18, left: 76, right: 16, minHeight: 66, borderRadius: 16, padding: 12, backgroundColor: '#FFFFFF', flexDirection: 'row', alignItems: 'center', shadowColor: '#000', shadowOpacity: 0.14, shadowRadius: 10, shadowOffset: { width: 0, height: 4 }, elevation: 5 },
-  addressIcon: { width: 40, height: 40, borderRadius: 20, backgroundColor: '#E8F1FB', alignItems: 'center', justifyContent: 'center', marginRight: 10 },
+  addressIcon: { width: 40, height: 40, borderRadius: 20, backgroundColor: '#E4EEFF', alignItems: 'center', justifyContent: 'center', marginRight: 10 },
   addressContent: { flex: 1 },
-  cardLabel: { fontSize: 11, fontWeight: '800', color: '#667085', marginBottom: 3 },
-  cardAddress: { fontSize: 14, lineHeight: 19, fontWeight: '700', color: '#123B65' },
+  cardLabel: { fontSize: 11, fontWeight: '800', color: '#667891', marginBottom: 3 },
+  cardAddress: { fontSize: 14, lineHeight: 19, fontWeight: '700', color: '#17366B' },
   mapControls: { position: 'absolute', right: 16, bottom: 230 },
   errorCard: { position: 'absolute', top: 96, left: 16, right: 16, borderRadius: 14, padding: 12, backgroundColor: '#FFF4F2', flexDirection: 'row', alignItems: 'center', gap: 8 },
   errorText: { flex: 1, color: '#B42318', fontSize: 12, lineHeight: 17 },
   bottomSheet: { position: 'absolute', left: 0, right: 0, bottom: 0, borderTopLeftRadius: 26, borderTopRightRadius: 26, paddingHorizontal: 20, paddingTop: 10, paddingBottom: 22, backgroundColor: '#FFFFFF', shadowColor: '#000', shadowOpacity: 0.18, shadowRadius: 12, shadowOffset: { width: 0, height: -3 }, elevation: 10 },
-  dragHandle: { width: 44, height: 4, borderRadius: 2, alignSelf: 'center', backgroundColor: '#D0D5DD', marginBottom: 16 },
+  dragHandle: { width: 44, height: 4, borderRadius: 2, alignSelf: 'center', backgroundColor: '#DCE4F0', marginBottom: 16 },
   sheetHeader: { flexDirection: 'row', alignItems: 'flex-start' },
   sheetContent: { flex: 1, marginLeft: 10 },
-  sheetTitle: { fontSize: 13, fontWeight: '800', color: '#667085', marginBottom: 4 },
-  sheetAddress: { fontSize: 16, lineHeight: 22, fontWeight: '800', color: '#123B65' },
-  instruction: { marginTop: 10, color: '#667085', fontSize: 12, lineHeight: 17 },
-  confirmButton: { minHeight: 48, marginTop: 16, borderRadius: 12, backgroundColor: '#1976D2', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 },
+  sheetTitle: { fontSize: 13, fontWeight: '800', color: '#667891', marginBottom: 4 },
+  sheetAddress: { fontSize: 16, lineHeight: 22, fontWeight: '800', color: '#17366B' },
+  instruction: { marginTop: 10, color: '#667891', fontSize: 12, lineHeight: 17 },
+  confirmButton: { minHeight: 48, marginTop: 16, borderRadius: 12, backgroundColor: '#285CC1', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 },
   disabledButton: { opacity: 0.5 },
   confirmButtonText: { color: '#FFFFFF', fontSize: 15, fontWeight: '800' },
 });

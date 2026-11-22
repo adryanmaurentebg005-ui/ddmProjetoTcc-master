@@ -1,120 +1,64 @@
-import { Link } from 'expo-router';
 import React from 'react';
-import { ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
+import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import { router } from 'expo-router';
+import { useAuth, getAuthErrorMessage } from '../../contexts/AuthContext';
 import { useAppTheme } from '../../contexts/ThemeContext';
-import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import { Button } from '../../components/Button';
 import { theme } from '../../constants/theme';
-import { getAuthErrorMessage, useAuth } from '../../contexts/AuthContext';
+import { Button } from '../../components/Button';
 
 export default function CadastroScreen() {
   const { signUp } = useAuth();
-  const { isDark } = useAppTheme();
+  useAppTheme();
   const [name, setName] = React.useState('');
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
-  const [error, setError] = React.useState<string | null>(null);
+  const [visible, setVisible] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
-
-  const handleSignUp = async () => {
-    if (!name.trim() || !email.trim() || !password) {
-      setError('Preencha nome, e-mail e senha.');
-      return;
-    }
-    setLoading(true);
-    setError(null);
-    try {
-      await signUp(name, email, password);
-    } catch (signupError) {
-      setError(getAuthErrorMessage(signupError));
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <LinearGradient colors={isDark ? ['#090D18', '#111827', '#151D2E'] : ['#1D4ED8', '#2563EB', '#7C3AED']} style={styles.container}>
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.keyboard}>
-        <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
-      <View style={styles.card}>
-        <MaterialIcons name="person-add" size={68} color={theme.colors.primary} />
-        <Text style={styles.title}>Criar conta</Text>
-
-        <Text style={styles.label}>Nome</Text>
-        <TextInput style={styles.input} placeholder="Seu nome" placeholderTextColor={theme.colors.placeholder} value={name} onChangeText={setName} />
-
-        <Text style={styles.label}>E-mail</Text>
-        <TextInput style={styles.input} placeholder="seu@email.com" placeholderTextColor={theme.colors.placeholder} value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" />
-
-        <Text style={styles.label}>Senha</Text>
-        <TextInput style={styles.input} placeholder="Sua senha" placeholderTextColor={theme.colors.placeholder} value={password} onChangeText={setPassword} secureTextEntry />
-
-        {error && <Text style={styles.error}>{error}</Text>}
-        <Button title={loading ? 'Cadastrando...' : 'Cadastrar'} onPress={handleSignUp} disabled={loading} />
-        {loading && <ActivityIndicator style={styles.loader} color={theme.colors.primaryLight} />}
-
-        <View style={styles.row}>
-          <Text style={styles.helperText}>Já possui conta?</Text>
-          <Link href="/(auth)/login" style={styles.link}>Entrar</Link>
+  const [error, setError] = React.useState('');
+  async function submit() {
+    if (!name.trim() || !email.trim() || !password) { setError('Preencha todos os campos.'); return; }
+    if (password.length < 6) { setError('A senha deve ter pelo menos 6 caracteres.'); return; }
+    setLoading(true); setError('');
+    try { await signUp(name, email, password); }
+    catch (err) { setError(getAuthErrorMessage(err)); }
+    finally { setLoading(false); }
+  }
+  return <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+    <ScrollView style={{ backgroundColor: theme.colors.background }} keyboardShouldPersistTaps="handled" contentContainerStyle={styles.content}>
+      <Pressable accessibilityRole="button" onPress={() => router.back()} style={styles.back}><MaterialCommunityIcons name="arrow-left" size={24} color={theme.colors.text}/></Pressable>
+      <View style={[styles.icon, { backgroundColor: theme.colors.elevated }]}><MaterialCommunityIcons name="account-plus-outline" size={35} color={theme.colors.primaryLight}/></View>
+      <Text style={[styles.kicker, { color: theme.colors.primaryLight }]}>FAÇA PARTE DA MUDANÇA</Text>
+      <Text style={[styles.title, { color: theme.colors.text }]}>Crie sua conta</Text>
+      <Text style={[styles.subtitle, { color: theme.colors.textSecondary }]}>Comece a contribuir para uma cidade melhor.</Text>
+      <View style={[styles.card, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
+        <Text style={[styles.label, { color: theme.colors.text }]}>Nome completo</Text>
+        <TextInput accessibilityLabel="Nome completo" style={[styles.field, { color: theme.colors.text, backgroundColor: theme.colors.elevated, borderColor: theme.colors.border }]} placeholder="Como podemos chamar você?" placeholderTextColor={theme.colors.placeholder} autoComplete="name" value={name} onChangeText={setName}/>
+        <Text style={[styles.label, { color: theme.colors.text }]}>E-mail</Text>
+        <TextInput accessibilityLabel="E-mail" style={[styles.field, { color: theme.colors.text, backgroundColor: theme.colors.elevated, borderColor: theme.colors.border }]} placeholder="seu@email.com" placeholderTextColor={theme.colors.placeholder} autoCapitalize="none" keyboardType="email-address" autoComplete="email" value={email} onChangeText={setEmail}/>
+        <Text style={[styles.label, { color: theme.colors.text }]}>Senha</Text>
+        <View style={[styles.passwordRow, { backgroundColor: theme.colors.elevated, borderColor: theme.colors.border }]}>
+          <TextInput accessibilityLabel="Senha" style={[styles.password, { color: theme.colors.text }]} placeholder="Mínimo de 6 caracteres" placeholderTextColor={theme.colors.placeholder} secureTextEntry={!visible} value={password} onChangeText={setPassword}/>
+          <Pressable accessibilityRole="button" accessibilityLabel={visible ? 'Ocultar senha' : 'Mostrar senha'} onPress={() => setVisible(!visible)}><MaterialCommunityIcons name={visible ? 'eye-off-outline' : 'eye-outline'} size={22} color={theme.colors.textSecondary}/></Pressable>
         </View>
+        {error ? <Text accessibilityRole="alert" style={{ color: theme.colors.error, marginBottom: 12 }}>{error}</Text> : null}
+        <Button title={loading ? 'Criando conta...' : 'Criar minha conta'} loading={loading} onPress={submit}/>
+        <View style={styles.footer}><Text style={{ color: theme.colors.textSecondary }}>Já tem uma conta? </Text><Pressable onPress={() => router.replace('/(auth)/login')}><Text style={{ color: theme.colors.primaryLight, fontWeight: '900' }}>Entrar</Text></Pressable></View>
       </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
-    </LinearGradient>
-  );
+    </ScrollView>
+  </KeyboardAvoidingView>;
 }
-
 const styles = StyleSheet.create({
-  container: { flex: 1 },
-  keyboard: { flex: 1 },
-  scroll: { flexGrow: 1, justifyContent: 'center', padding: 20 },
-  card: {
-    backgroundColor: theme.colors.surface,
-    borderRadius: 20,
-    padding: 24,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: '800',
-    color: theme.colors.primary,
-    marginBottom: 20,
-    textAlign: 'center',
-  },
-  label: {
-    color: theme.colors.text,
-    fontWeight: '700',
-    marginBottom: 8,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    borderRadius: 12,
-    padding: 14,
-    marginBottom: 14,
-    backgroundColor: theme.colors.elevated,
-    color: theme.colors.inputText,
-  },
-  row: {
-    marginTop: 18,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 6,
-  },
-  helperText: {
-    color: theme.colors.textSecondary,
-  },
-  link: {
-    color: theme.colors.primaryLight,
-    fontWeight: '700',
-  },
-  error: {
-    color: theme.colors.error,
-    marginBottom: 12,
-  },
-  loader: {
-    marginTop: 10,
-  },
+  content: { flexGrow: 1, paddingHorizontal: 20, paddingBottom: 40, paddingTop: 22, maxWidth: 600, width: '100%', alignSelf: 'center' },
+  back: { width: 44, height: 44, justifyContent: 'center', marginBottom: 19 },
+  icon: { width: 65, height: 65, borderRadius: 22, alignItems: 'center', justifyContent: 'center', marginBottom: 19 },
+  kicker: { fontSize: 10, letterSpacing: 2, fontWeight: '900' },
+  title: { fontSize: 32, fontWeight: '900', letterSpacing: -1, marginTop: 8 },
+  subtitle: { fontSize: 14, lineHeight: 21, marginTop: 7, marginBottom: 25 },
+  card: { borderWidth: 1, borderRadius: 24, padding: 22 },
+  label: { fontSize: 13, fontWeight: '800', marginBottom: 9 },
+  field: { minHeight: 54, borderWidth: 1, borderRadius: 14, paddingHorizontal: 14, fontSize: 15, marginBottom: 17 },
+  passwordRow: { minHeight: 54, borderWidth: 1, borderRadius: 14, paddingHorizontal: 14, flexDirection: 'row', alignItems: 'center', marginBottom: 20 },
+  password: { flex: 1, paddingVertical: 13, fontSize: 15 },
+  footer: { flexDirection: 'row', justifyContent: 'center', marginTop: 21 },
 });
