@@ -99,11 +99,11 @@ const createStyles = () => StyleSheet.create({
   card: { backgroundColor: theme.colors.surface, borderRadius: 20, padding: 20, alignItems: 'center' },
   subtitle: { marginTop: 10, marginBottom: 18, color: theme.colors.textSecondary, textAlign: 'center' },
   locationButton: { minHeight: 48, width: '100%', borderRadius: 12, backgroundColor: theme.colors.primaryLight, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 18 },
-  locationButtonText: { color: theme.colors.surface, fontWeight: '800' },
+  locationButtonText: { color: '#FFFFFF', fontWeight: '800' },
   label: { alignSelf: 'flex-start', color: theme.colors.text, fontWeight: '700', marginBottom: 8 },
   input: { width: '100%', borderWidth: 1, borderColor: theme.colors.border, borderRadius: 12, padding: 13, marginBottom: 14, backgroundColor: theme.colors.surface, color: theme.colors.inputText },
   addressInput: { minHeight: 70 },
   error: { color: theme.colors.error, marginBottom: 12, alignSelf: 'stretch' },
   confirmButton: { minHeight: 48, width: '100%', borderRadius: 12, backgroundColor: theme.colors.text, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 },
-  confirmButtonText: { color: theme.colors.surface, fontWeight: '800' },
+  confirmButtonText: { color: '#FFFFFF', fontWeight: '800' },
 });

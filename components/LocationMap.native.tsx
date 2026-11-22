@@ -231,5 +231,5 @@ const createStyles = () => StyleSheet.create({
   instruction: { marginTop: 10, color: theme.colors.textSecondary, fontSize: 12, lineHeight: 17 },
   confirmButton: { minHeight: 48, marginTop: 16, borderRadius: 12, backgroundColor: theme.colors.primaryLight, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 },
   disabledButton: { opacity: 0.5 },
-  confirmButtonText: { color: theme.colors.surface, fontSize: 15, fontWeight: '800' },
+  confirmButtonText: { color: '#FFFFFF', fontSize: 15, fontWeight: '800' },
 });
