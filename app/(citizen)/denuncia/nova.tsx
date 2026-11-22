@@ -28,7 +28,7 @@ export default function NovaDenunciaScreen() {
   }>();
   const latitude = Number(params.latitude);
   const longitude = Number(params.longitude);
-  const hasLocation = Number.isFinite(latitude) && Number.isFinite(longitude) && Math.abs(latitude) <= 90 && Math.abs(longitude) <= 180 && Boolean(params.address);
+  const hasLocation = Number.isFinite(latitude) && Number.isFinite(longitude) && Boolean(params.address);
   const { user } = useAuth();
   const [title, setTitle] = React.useState('');
   const [description, setDescription] = React.useState('');
@@ -76,7 +76,7 @@ export default function NovaDenunciaScreen() {
       router.replace({ pathname: '/(citizen)/minhas-denuncias', params: { success: '1' } });
     } catch (saveError) {
       console.error(saveError);
-      setError(saveError instanceof Error ? saveError.message : 'Não foi possível salvar a denúncia. Tente novamente.');
+      setError('Não foi possível salvar a denúncia. Tente novamente.');
     } finally {
       setPhotoUploading(false);
       setLoading(false);
@@ -84,13 +84,10 @@ export default function NovaDenunciaScreen() {
   };
 
   const requestSubmit = () => {
-    if (title.trim().length < 3 || description.trim().length < 10) {
-      setError('Informe um título com pelo menos 3 caracteres e uma descrição com pelo menos 10.');
+    if (!title.trim() || !description.trim()) {
+      setError('Preencha o título e a descrição.');
       return;
     }
-    if (!hasLocation) { setError('Confirme a localização antes de enviar.'); return; }
-    if (title.trim().length > 120 || description.trim().length > 5000) { setError('Título ou descrição muito longos.'); return; }
-    setError(null);
     setShowConfirmation(true);
   };
 
@@ -130,7 +127,7 @@ export default function NovaDenunciaScreen() {
             <MaterialCommunityIcons
               name="arrow-left"
               size={24}
-              color="#17366B"
+              color="#123B65"
             />
           </Pressable>
         </Link>
@@ -146,7 +143,7 @@ export default function NovaDenunciaScreen() {
 
       <View style={styles.form}>
         <View style={styles.confirmedLocation}>
-          <MaterialCommunityIcons name="map-marker-check" size={22} color="#285CC1" />
+          <MaterialCommunityIcons name="map-marker-check" size={22} color="#1976D2" />
           <View style={styles.confirmedLocationText}>
             <Text style={styles.confirmedLocationTitle}>{hasLocation ? 'Localização confirmada' : 'Localização não informada'}</Text>
             <Text style={styles.confirmedLocationAddress}>{params.address ?? 'Volte e selecione o local da ocorrência.'}</Text>
@@ -156,7 +153,7 @@ export default function NovaDenunciaScreen() {
           </View>
           <Link href="/(citizen)/denuncia/localizacao" asChild>
             <Pressable accessibilityLabel="Alterar localização">
-            <MaterialCommunityIcons name="pencil" size={20} color="#17366B" />
+            <MaterialCommunityIcons name="pencil" size={20} color="#123B65" />
             </Pressable>
           </Link>
         </View>
@@ -181,7 +178,7 @@ export default function NovaDenunciaScreen() {
           <MaterialCommunityIcons
             name="chevron-down"
             size={22}
-            color="#667891"
+            color="#667085"
           />
         </Pressable>
 
@@ -198,7 +195,7 @@ export default function NovaDenunciaScreen() {
         />
 
         <View style={styles.registrationNotice}>
-          <MaterialCommunityIcons name="clock-check-outline" size={20} color="#285CC1" />
+          <MaterialCommunityIcons name="clock-check-outline" size={20} color="#1976D2" />
           <View style={styles.registrationNoticeContent}>
             <Text style={styles.registrationNoticeText}>Data e hora da ocorrência: {registrationDate.toLocaleString('pt-BR')}</Text>
             <Pressable onPress={openDatePicker} style={styles.timePickerButton}>
@@ -240,7 +237,7 @@ export default function NovaDenunciaScreen() {
           </View>
         ) : (
           <Pressable style={styles.photoButton} onPress={escolherImagem}>
-            <MaterialCommunityIcons name="camera-plus" size={22} color="#285CC1" />
+            <MaterialCommunityIcons name="camera-plus" size={22} color="#1976D2" />
             <Text style={styles.photoButtonText}>Selecionar foto</Text>
           </Pressable>
         )}
@@ -269,7 +266,7 @@ export default function NovaDenunciaScreen() {
               <Pressable style={styles.cancelButton} onPress={() => setShowConfirmation(false)}><Text style={styles.cancelText}>Cancelar</Text></Pressable>
               <Pressable style={styles.confirmButton} onPress={submit} disabled={loading}><Text style={styles.confirmText}>{loading ? 'Salvando...' : 'Confirmar'}</Text></Pressable>
             </View>
-            {loading && <ActivityIndicator style={styles.loader} color="#285CC1" />}
+            {loading && <ActivityIndicator style={styles.loader} color="#1976D2" />}
           </View>
         </View>
       </Modal>
@@ -280,7 +277,7 @@ export default function NovaDenunciaScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F3F6FC',
+    backgroundColor: '#F5F7FA',
   },
 
   content: {
@@ -311,25 +308,25 @@ const styles = StyleSheet.create({
 
   title: {
     fontSize: 28,
-    fontWeight: '900',
-    color: '#17366B',
+    fontWeight: '800',
+    color: '#123B65',
   },
 
   subtitle: {
     marginTop: 4,
     fontSize: 14,
-    color: '#667891',
+    color: '#667085',
   },
 
   form: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 24,
+    borderRadius: 20,
     padding: 18,
   },
 
   confirmedLocation: {
     borderRadius: 14,
-    backgroundColor: '#EDF3FC',
+    backgroundColor: '#F2F7FC',
     padding: 14,
     marginBottom: 20,
     flexDirection: 'row',
@@ -343,40 +340,40 @@ const styles = StyleSheet.create({
 
   confirmedLocationTitle: {
     fontSize: 14,
-    fontWeight: '900',
-    color: '#17366B',
+    fontWeight: '800',
+    color: '#123B65',
     marginBottom: 4,
   },
 
   confirmedLocationAddress: {
     fontSize: 14,
     lineHeight: 19,
-    color: '#344662',
+    color: '#344054',
   },
 
   confirmedLocationCoordinates: {
     fontSize: 12,
-    color: '#667891',
+    color: '#667085',
     marginTop: 4,
   },
 
   label: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#17366B',
+    color: '#123B65',
     marginBottom: 8,
   },
 
   input: {
     minHeight: 48,
     borderWidth: 1,
-    borderColor: '#DCE4F0',
-    borderRadius: 15,
+    borderColor: '#D1D5DB',
+    borderRadius: 12,
     paddingHorizontal: 14,
     paddingVertical: 12,
     marginBottom: 18,
     fontSize: 16,
-    color: '#13213B',
+    color: '#101828',
     backgroundColor: '#FFFFFF',
   },
 
@@ -388,8 +385,8 @@ const styles = StyleSheet.create({
   select: {
     minHeight: 48,
     borderWidth: 1,
-    borderColor: '#DCE4F0',
-    borderRadius: 15,
+    borderColor: '#D1D5DB',
+    borderRadius: 12,
     paddingHorizontal: 14,
     marginBottom: 18,
     flexDirection: 'row',
@@ -400,20 +397,20 @@ const styles = StyleSheet.create({
 
   selectText: {
     fontSize: 16,
-    color: '#667891',
+    color: '#667085',
   },
   registrationNotice: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    backgroundColor: '#EDF3FC',
-    borderRadius: 15,
+    backgroundColor: '#F2F7FC',
+    borderRadius: 12,
     padding: 12,
     marginBottom: 4,
   },
   registrationNoticeText: {
     flex: 1,
-    color: '#344662',
+    color: '#344054',
     fontSize: 13,
     lineHeight: 18,
   },
@@ -425,7 +422,7 @@ const styles = StyleSheet.create({
     marginTop: 6,
   },
   timePickerButtonText: {
-    color: '#285CC1',
+    color: '#1976D2',
     fontSize: 13,
     fontWeight: '700',
   },
@@ -433,7 +430,7 @@ const styles = StyleSheet.create({
   locationCard: {
     minHeight: 90,
     borderRadius: 14,
-    backgroundColor: '#EDF3FC',
+    backgroundColor: '#F2F7FC',
     padding: 14,
     flexDirection: 'row',
     alignItems: 'center',
@@ -443,7 +440,7 @@ const styles = StyleSheet.create({
     width: 46,
     height: 46,
     borderRadius: 23,
-    backgroundColor: '#DCE9FC',
+    backgroundColor: '#DCEBFA',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
@@ -456,20 +453,20 @@ const styles = StyleSheet.create({
   locationTitle: {
     fontSize: 15,
     fontWeight: '700',
-    color: '#17366B',
+    color: '#123B65',
     marginBottom: 4,
   },
 
   locationText: {
     fontSize: 13,
     lineHeight: 18,
-    color: '#667891',
+    color: '#667085',
   },
 
   primaryButton: {
     minHeight: 54,
     borderRadius: 14,
-    backgroundColor: '#285CC1',
+    backgroundColor: '#1976D2',
     marginTop: 20,
     flexDirection: 'row',
     alignItems: 'center',
@@ -480,7 +477,7 @@ const styles = StyleSheet.create({
   primaryButtonText: {
     color: '#FFFFFF',
     fontSize: 15,
-    fontWeight: '900',
+    fontWeight: '800',
   },
 
   disabledButton: {
@@ -503,22 +500,22 @@ const styles = StyleSheet.create({
     padding: 22,
   },
   modalTitle: {
-    color: '#17366B',
+    color: '#123B65',
     fontSize: 20,
-    fontWeight: '900',
+    fontWeight: '800',
     marginBottom: 14,
   },
   modalText: {
-    color: '#344662',
+    color: '#344054',
     marginBottom: 20,
   },
   modalOption: {
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#E1E8F3',
+    borderBottomColor: '#E4E7EC',
   },
   modalOptionText: {
-    color: '#17366B',
+    color: '#123B65',
     fontSize: 16,
   },
   modalActions: {
@@ -530,11 +527,11 @@ const styles = StyleSheet.create({
     padding: 12,
   },
   cancelText: {
-    color: '#667891',
+    color: '#667085',
     fontWeight: '700',
   },
   confirmButton: {
-    backgroundColor: '#285CC1',
+    backgroundColor: '#1976D2',
     borderRadius: 10,
     padding: 12,
   },
@@ -551,8 +548,8 @@ const styles = StyleSheet.create({
   imageUploadButton: {
     minHeight: 48,
     borderWidth: 1,
-    borderColor: '#DCE4F0',
-    borderRadius: 15,
+    borderColor: '#D1D5DB',
+    borderRadius: 12,
     paddingHorizontal: 14,
     alignItems: 'center',
     justifyContent: 'center',
@@ -561,13 +558,13 @@ const styles = StyleSheet.create({
   imagePreview: {
     width: '100%',
     height: 200,
-    borderRadius: 15,
+    borderRadius: 12,
     marginTop: 8,
   },
   photoContainer: {
     borderWidth: 1,
-    borderColor: '#DCE4F0',
-    borderRadius: 15,
+    borderColor: '#D1D5DB',
+    borderRadius: 12,
     overflow: 'hidden',
     marginBottom: 18,
   },
@@ -578,12 +575,12 @@ const styles = StyleSheet.create({
   },
   photoButton: {
     padding: 12,
-    backgroundColor: '#EDF3FC',
+    backgroundColor: '#F2F7FC',
     alignItems: 'center',
     justifyContent: 'center',
   },
   photoButtonText: {
-    color: '#285CC1',
+    color: '#1976D2',
     fontWeight: '700',
     marginTop: 4,
   },

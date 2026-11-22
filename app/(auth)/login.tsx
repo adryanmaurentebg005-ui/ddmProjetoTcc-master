@@ -1,69 +1,135 @@
+import { Link } from 'expo-router';
 import React from 'react';
-import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { LinearGradient } from 'expo-linear-gradient';
-import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-import { router } from 'expo-router';
-import { useAuth, getAuthErrorMessage } from '../../contexts/AuthContext';
 import { useAppTheme } from '../../contexts/ThemeContext';
-import { theme } from '../../constants/theme';
 import { Button } from '../../components/Button';
+import { theme } from '../../constants/theme';
+import { getAuthErrorMessage, useAuth } from '../../contexts/AuthContext';
 
 export default function LoginScreen() {
   const { signIn } = useAuth();
   const { isDark } = useAppTheme();
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
-  const [visible, setVisible] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
   const [loading, setLoading] = React.useState(false);
-  const [error, setError] = React.useState('');
-  async function submit() {
-    if (!email.trim() || !password) { setError('Informe seu e-mail e sua senha.'); return; }
-    setLoading(true); setError('');
-    try { await signIn(email, password); }
-    catch (err) { setError(getAuthErrorMessage(err)); }
-    finally { setLoading(false); }
-  }
-  return <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-    <ScrollView keyboardShouldPersistTaps="handled" style={{ backgroundColor: theme.colors.background }} contentContainerStyle={styles.scroll}>
-      <LinearGradient colors={isDark ? ['#172B55', '#26315F'] : ['#142B64', '#285CC1']} style={styles.hero}>
-        <View style={styles.brand}><MaterialCommunityIcons name="city-variant-outline" size={29} color="#FFFFFF"/></View>
-        <Text style={styles.brandName}>DENÚNCIA URBANA</Text>
-        <Text style={styles.heroTitle}>Sua voz transforma a cidade.</Text>
-        <Text style={styles.heroSubtitle}>Participe, registre e acompanhe. Um espaço para fazer a diferença.</Text>
-      </LinearGradient>
-      <View style={[styles.card, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
-        <Text style={[styles.title, { color: theme.colors.text }]}>Bem-vindo de volta</Text>
-        <Text style={[styles.subtitle, { color: theme.colors.textSecondary }]}>Entre na sua conta para continuar.</Text>
-        <Text style={[styles.label, { color: theme.colors.text }]}>E-mail</Text>
-        <View style={[styles.field, { borderColor: theme.colors.border, backgroundColor: theme.colors.elevated }]}>
-          <MaterialCommunityIcons name="email-outline" size={21} color={theme.colors.textSecondary}/>
-          <TextInput accessibilityLabel="E-mail" style={[styles.input, { color: theme.colors.text }]} placeholder="seu@email.com" placeholderTextColor={theme.colors.placeholder} keyboardType="email-address" autoCapitalize="none" autoComplete="email" value={email} onChangeText={setEmail}/>
+
+  const handleLogin = async () => {
+    if (!email.trim() || !password) {
+      setError('Preencha e-mail e senha.');
+      return;
+    }
+    setLoading(true);
+    setError(null);
+    try {
+      await signIn(email, password);
+    } catch (error) {
+      setError(getAuthErrorMessage(error));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <LinearGradient colors={isDark ? ['#090D18', '#111827', '#151D2E'] : ['#1D4ED8', '#2563EB', '#7C3AED']} style={styles.container}>
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.keyboard}>
+        <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+          <View style={styles.brandMark}>
+            <LinearGradient colors={['#60A5FA', '#22D3EE']} style={styles.brandIcon}>
+              <MaterialIcons name="gavel" size={30} color="#FFFFFF" />
+            </LinearGradient>
+            <Text style={styles.brandTitle}>Denúncia Urbana</Text>
+          </View>
+          <View style={styles.card}>
+        <MaterialIcons name="account-circle" size={72} color={theme.colors.primary} />
+        <Text style={styles.title}>Acesso ao sistema</Text>
+        <Text style={styles.subtitle}>Entre com sua conta para acompanhar denúncias.</Text>
+
+        <Text style={styles.label}>E-mail</Text>
+        <TextInput style={styles.input} placeholder="seu@email.com" placeholderTextColor={theme.colors.placeholder} value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" />
+
+        <Text style={styles.label}>Senha</Text>
+        <TextInput style={styles.input} placeholder="Sua senha" placeholderTextColor={theme.colors.placeholder} value={password} onChangeText={setPassword} secureTextEntry />
+
+        {error && <Text style={styles.error}>{error}</Text>}
+        <Button title={loading ? 'Entrando...' : 'Entrar'} onPress={handleLogin} disabled={loading} />
+        {loading && <ActivityIndicator style={styles.loader} color={theme.colors.primaryLight} />}
+
+        <View style={styles.row}>
+          <Text style={styles.helperText}>Não tem conta?</Text>
+          <Link href="/(auth)/cadastro" style={styles.link}>Cadastre-se</Link>
         </View>
-        <Text style={[styles.label, { color: theme.colors.text }]}>Senha</Text>
-        <View style={[styles.field, { borderColor: theme.colors.border, backgroundColor: theme.colors.elevated }]}>
-          <MaterialCommunityIcons name="lock-outline" size={21} color={theme.colors.textSecondary}/>
-          <TextInput accessibilityLabel="Senha" style={[styles.input, { color: theme.colors.text }]} placeholder="Sua senha" placeholderTextColor={theme.colors.placeholder} secureTextEntry={!visible} value={password} onChangeText={setPassword}/>
-          <Pressable accessibilityRole="button" accessibilityLabel={visible ? 'Ocultar senha' : 'Mostrar senha'} onPress={() => setVisible(!visible)}><MaterialCommunityIcons name={visible ? 'eye-off-outline' : 'eye-outline'} size={21} color={theme.colors.textSecondary}/></Pressable>
-        </View>
-        {error ? <Text accessibilityRole="alert" style={{ color: theme.colors.error, marginBottom: 12 }}>{error}</Text> : null}
-        <Button title={loading ? 'Entrando...' : 'Entrar na conta'} onPress={submit} loading={loading}/>
-        <View style={styles.footer}><Text style={{ color: theme.colors.textSecondary }}>Ainda não tem conta? </Text><Pressable onPress={() => router.push('/(auth)/cadastro')}><Text style={{ color: theme.colors.primaryLight, fontWeight: '900' }}>Cadastre-se</Text></Pressable></View>
-      </View>
-    </ScrollView>
-  </KeyboardAvoidingView>;
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </LinearGradient>
+  );
 }
+
 const styles = StyleSheet.create({
-  scroll: { flexGrow: 1, paddingBottom: 32, width: '100%', maxWidth: 600, alignSelf: 'center' },
-  hero: { paddingTop: 47, paddingHorizontal: 27, paddingBottom: 65, borderBottomLeftRadius: 35, borderBottomRightRadius: 35 },
-  brand: { width: 53, height: 53, borderRadius: 17, backgroundColor: 'rgba(255,255,255,0.18)', alignItems: 'center', justifyContent: 'center', marginBottom: 15 },
-  brandName: { color: '#D9E9FF', letterSpacing: 2.1, fontSize: 11, fontWeight: '900' },
-  heroTitle: { color: '#FFFFFF', fontSize: 34, fontWeight: '900', letterSpacing: -1, lineHeight: 39, marginTop: 18, maxWidth: 310 },
-  heroSubtitle: { color: '#DBEAFE', fontSize: 13, lineHeight: 21, marginTop: 12, maxWidth: 320 },
-  card: { marginHorizontal: 18, marginTop: -28, borderWidth: 1, borderRadius: 25, padding: 24 },
-  title: { fontSize: 23, fontWeight: '900', letterSpacing: -0.6 },
-  subtitle: { fontSize: 13, marginTop: 6, marginBottom: 25 },
-  label: { fontSize: 13, fontWeight: '800', marginBottom: 9 },
-  field: { borderWidth: 1, borderRadius: 15, minHeight: 54, flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 14, marginBottom: 17 },
-  input: { flex: 1, paddingVertical: 13, fontSize: 15 },
-  footer: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: 23 },
+  container: { flex: 1 },
+  keyboard: { flex: 1 },
+  scroll: { flexGrow: 1, justifyContent: 'center', padding: 20 },
+  brandMark: { alignItems: 'center', marginBottom: 18 },
+  brandIcon: { width: 58, height: 58, borderRadius: 18, alignItems: 'center', justifyContent: 'center', marginBottom: 8 },
+  brandTitle: { color: '#FFFFFF', fontSize: 21, fontWeight: '700' },
+  card: {
+    backgroundColor: theme.colors.surface,
+    borderRadius: 20,
+    padding: 24,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: '800',
+    color: theme.colors.primary,
+    marginTop: 10,
+  },
+  subtitle: {
+    color: theme.colors.textSecondary,
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  label: {
+    alignSelf: 'flex-start',
+    color: theme.colors.text,
+    fontWeight: '700',
+    marginBottom: 8,
+  },
+  input: {
+    width: '100%',
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    borderRadius: 12,
+    padding: 14,
+    marginBottom: 14,
+    fontSize: 16,
+    backgroundColor: theme.colors.elevated,
+    color: theme.colors.inputText,
+  },
+  row: {
+    marginTop: 18,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  helperText: {
+    color: theme.colors.textSecondary,
+  },
+  link: {
+    color: theme.colors.primaryLight,
+    fontWeight: '700',
+  },
+  error: {
+    color: theme.colors.error,
+    alignSelf: 'stretch',
+    marginBottom: 12,
+  },
+  loader: {
+    marginTop: 10,
+  },
 });

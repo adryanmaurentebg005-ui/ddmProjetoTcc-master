@@ -1,7 +1,53 @@
-import { ScreenShell, Surface, InfoRow } from '../../components/ScreenShell';
+import { StyleSheet, Text, View } from 'react-native';
+import { theme } from '../../constants/theme';
+import { useAppTheme } from '../../contexts/ThemeContext';
+
 export default function ModeratorDashboardScreen() {
-  return <ScreenShell title="Moderação" subtitle="Análise e acompanhamento de solicitações." icon="clipboard-check-outline">
-    <Surface><InfoRow icon="file-search-outline" title="Fila de análise" description="A moderação requer autorização por papel e acesso seguro às denúncias encaminhadas."/></Surface>
-    <Surface><InfoRow icon="progress-check" title="Acompanhamento" description="Os indicadores serão exibidos após a integração com o fluxo de atendimento."/></Surface>
-  </ScreenShell>;
+  useAppTheme();
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>Dashboard do moderador</Text>
+      <View style={styles.cardRow}>
+        <View style={styles.card}><Text style={styles.cardValue}>12</Text><Text style={styles.cardLabel}>Recebidas</Text></View>
+        <View style={styles.card}><Text style={styles.cardValue}>5</Text><Text style={styles.cardLabel}>Em análise</Text></View>
+      </View>
+    </View>
+  );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: theme.colors.background,
+    padding: 20,
+    justifyContent: 'center',
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: '800',
+    color: theme.colors.primary,
+    marginBottom: 18,
+  },
+  cardRow: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  card: {
+    flex: 1,
+    backgroundColor: theme.colors.surface,
+    borderRadius: 16,
+    padding: 20,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+  },
+  cardValue: {
+    fontSize: 30,
+    fontWeight: '800',
+    color: theme.colors.primary,
+  },
+  cardLabel: {
+    color: theme.colors.textSecondary,
+    marginTop: 4,
+  },
+});

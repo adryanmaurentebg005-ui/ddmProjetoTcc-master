@@ -35,9 +35,8 @@ function WebSafeArea() {
 }
 
 function SafeAreaShell({ children }: { children: ReactNode }) {
-  const { isDark } = useAppTheme();
   return (
-    <SafeAreaView edges={['top']} style={[styles.safeArea, { backgroundColor: isDark ? '#090D18' : '#F3F6FC' }]}>
+    <SafeAreaView edges={['top']} style={styles.safeArea}>
       {children}
     </SafeAreaView>
   );
@@ -59,7 +58,7 @@ function RouteGuard() {
   return (
     <SafeAreaShell>
       <StatusBar style={isDark ? 'light' : 'dark'} />
-      <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: isDark ? '#090D18' : '#F3F6FC' } }} />
+      <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: theme.colors.background } }} />
     </SafeAreaShell>
   );
 }

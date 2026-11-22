@@ -1,45 +1,16 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    function signedIn() {
-      return request.auth != null;
-    }
-
-    function isOwner() {
-      return signedIn() && resource.data.usuarioId == request.auth.uid;
-    }
-
-    function validText() {
-      return request.resource.data.titulo is string
-        && request.resource.data.titulo.size() >= 3
-        && request.resource.data.titulo.size() <= 120
-        && request.resource.data.descricao is string
-        && request.resource.data.descricao.size() >= 10
-        && request.resource.data.descricao.size() <= 5000
-        && request.resource.data.categoriaId is string;
-    }
-
     match /denuncias/{denunciaId} {
-      allow create: if signedIn()
-        && request.resource.data.usuarioId == request.auth.uid
-        && request.resource.data.keys().hasOnly([
-          'titulo', 'categoriaId', 'descricao', 'dataOcorrencia',
-          'usuarioId', 'localizacao', 'fotos', 'data', 'status', 'protocolo'
-        ])
-        && request.resource.data.status == 'ENVIADA'
-        && request.resource.data.data == request.time
-        && request.resource.data.protocolo is string
-        && validText();
-
-      allow read: if isOwner();
-
-      // Citizens may edit content, never workflow, ownership or timestamps.
-      allow update: if isOwner()
-        && request.resource.data.diff(resource.data).affectedKeys()
-          .hasOnly(['titulo', 'descricao', 'categoriaId'])
-        && validText();
-
-      allow delete: if isOwner();
+      allow create: if request.auth != null
+        && request.resource.data.usuarioId == request.auth.uid;
+      allow read: if request.auth != null
+        && resource.data.usuarioId == request.auth.uid;
+      allow update: if request.auth != null
+        && resource.data.usuarioId == request.auth.uid
+        && request.resource.data.usuarioId == request.auth.uid;
+      allow delete: if request.auth != null
+        && resource.data.usuarioId == request.auth.uid;
     }
 
     match /{document=**} {
