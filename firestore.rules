@@ -5,6 +5,18 @@ service cloud.firestore {
       return request.auth != null;
     }
 
+    // Provision administrators only via Firebase Console or Admin SDK, never from the app.
+    function isAdmin() {
+      return signedIn()
+        && exists(/databases/$(database)/documents/administradores/$(request.auth.uid))
+        && get(/databases/$(database)/documents/administradores/$(request.auth.uid)).data.ativo == true;
+    }
+
+    match /administradores/{uid} {
+      allow get: if signedIn() && request.auth.uid == uid;
+      allow list, create, update, delete: if false;
+    }
+
     function isOwner() {
       return signedIn() && resource.data.usuarioId == request.auth.uid;
     }
@@ -31,15 +43,21 @@ service cloud.firestore {
         && request.resource.data.protocolo is string
         && validText();
 
-      allow read: if isOwner();
+      allow read: if isOwner() || isAdmin();
 
       // Citizens may edit content, never workflow, ownership or timestamps.
-      allow update: if isOwner()
+      allow update: if (isOwner()
         && request.resource.data.diff(resource.data).affectedKeys()
           .hasOnly(['titulo', 'descricao', 'categoriaId'])
-        && validText();
+        && validText())
+        || (isAdmin()
+          && request.resource.data.diff(resource.data).affectedKeys()
+            .hasOnly(['status', 'observacaoAdmin', 'atualizadoEm', 'atualizadoPor'])
+          && request.resource.data.status in ['ENVIADA', 'EM_ANALISE', 'AGUARDANDO_INFORMACOES', 'VALIDADA', 'EM_ATENDIMENTO', 'RESOLVIDA', 'REJEITADA']
+          && request.resource.data.atualizadoPor == request.auth.uid
+          && request.resource.data.atualizadoEm == request.time);
 
-      allow delete: if isOwner();
+      allow delete: if isOwner() || isAdmin();
     }
 
     match /{document=**} {

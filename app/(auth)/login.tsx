@@ -47,6 +47,7 @@ export default function LoginScreen() {
         </View>
         {error ? <Text accessibilityRole="alert" style={{ color: theme.colors.error, marginBottom: 12 }}>{error}</Text> : null}
         <Button title={loading ? 'Entrando...' : 'Entrar na conta'} onPress={submit} loading={loading}/>
+        <Pressable accessibilityRole="button" onPress={() => router.push('/(auth)/admin-login')} style={{ marginTop: 19, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7 }}><MaterialCommunityIcons name="shield-account-outline" size={20} color={theme.colors.primaryLight}/><Text style={{ color: theme.colors.primaryLight, fontWeight: '800' }}>Acesso administrativo</Text></Pressable>
         <View style={styles.footer}><Text style={{ color: theme.colors.textSecondary }}>Ainda não tem conta? </Text><Pressable onPress={() => router.push('/(auth)/cadastro')}><Text style={{ color: theme.colors.primaryLight, fontWeight: '900' }}>Cadastre-se</Text></Pressable></View>
       </View>
     </ScrollView>
