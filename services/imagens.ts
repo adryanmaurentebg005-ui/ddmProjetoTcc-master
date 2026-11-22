@@ -1,7 +1,7 @@
 export async function enviarImagemParaImgBB(uri: string, base64?: string | null) {
   const apiKey = process.env.EXPO_PUBLIC_IMGBB_API_KEY;
   if (!apiKey) {
-    throw new Error('Configure EXPO_PUBLIC_IMGBB_API_KEY no arquivo .env para enviar imagens.');
+    throw new Error('O envio de imagens não está configurado. Remova a foto para registrar a denúncia sem anexo ou configure o serviço de imagens.');
   }
 
   let image = base64;
