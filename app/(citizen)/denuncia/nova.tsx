@@ -1,4 +1,4 @@
-import { Link, router, useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import React from 'react';
 import {
   ActivityIndicator,
@@ -128,15 +128,13 @@ export default function NovaDenunciaScreen() {
       showsVerticalScrollIndicator={false}
     >
       <View style={styles.header}>
-        <Link href="/" asChild>
-          <Pressable style={[styles.backButton, { backgroundColor: theme.colors.elevated }]}>
+        <Pressable accessibilityRole="button" accessibilityLabel="Voltar ao início" onPress={() => router.replace("/(citizen)/home")} style={[styles.backButton, { backgroundColor: theme.colors.elevated }]}>
             <MaterialCommunityIcons
               name="arrow-left"
               size={24}
               color={theme.colors.primaryLight}
             />
-          </Pressable>
-        </Link>
+        </Pressable>
 
         <View style={styles.headerText}>
           <Text style={[styles.title, { color: theme.colors.text }]}>Nova denúncia</Text>
@@ -157,11 +155,9 @@ export default function NovaDenunciaScreen() {
               {hasLocation ? `${latitude.toFixed(6)}, ${longitude.toFixed(6)}` : 'Latitude e longitude serão salvas após a confirmação.'}
             </Text>
           </View>
-          <Link href="/(citizen)/denuncia/localizacao" asChild>
-            <Pressable accessibilityLabel="Alterar localização">
+          <Pressable accessibilityRole="button" onPress={() => router.push("/(citizen)/denuncia/localizacao")} accessibilityLabel="Alterar localização">
             <MaterialCommunityIcons name="pencil" size={20} color="#17366B" />
-            </Pressable>
-          </Link>
+          </Pressable>
         </View>
 
         <Text style={[styles.label, { color: theme.colors.text }]}>Título</Text>
